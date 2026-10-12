@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>bmc-ppt 부품 모음</title>
+<!--
+  부품 모음 (16:9, 1부품 = 1슬라이드). scripts/new_deck.py가 이 파일에서 부품을 골라 덱을 조립한다.
+  - 각 부품 앞의 주석 "@part 번호 | 유형ID | 이름 | 쓰는 경우"를 new_deck.py와 design/catalog.md가 읽는다.
+  - {{ }} 안의 글자는 자리표시자다. 덱에 하나라도 남으면 check_deck.py가 FAIL을 낸다.
+  - 헤드메시지 자리에는 견본 문장을 일부러 넣지 않았다. 견본 문형을 따라 쓰지 않게 하기 위해서다.
+  - 변환 제약: transform, ::before/::after 장식, SVG를 쓰지 않는다 (design/deck.css 머리말 참조).
+-->
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<main class="deck" data-theme="rose">
+
+<!-- @part p01 | cover | 표지 | 덱의 첫 장 -->
+<section class="slide cover">
+  <div class="cv-l"></div>
+  <div class="cv-brand">{{회사명}}</div>
+  <div class="cv-title">{{덱 제목}}</div>
+  <div class="cv-rule"></div>
+  <div class="cv-sub">{{한 줄 소개}}</div>
+  <div class="cv-meta">{{날짜}}<br>{{문서 구분}}</div>
+</section>
+
+<!-- @part p02 | exec_summary | 핵심 요약 | 결론과 논점을 첫머리에서 한눈에 보여줄 때. 각 행은 본문 슬라이드 한 장에 대응한다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="exec">
+      <div class="ex"><div class="no">01</div><div><div class="mn">{{주문 1}}</div><ul><li>{{근거 1-1}}</li><li>{{근거 1-2}}</li></ul></div></div>
+      <div class="ex"><div class="no">02</div><div><div class="mn">{{주문 2}}</div><ul><li>{{근거 2-1}}</li><li>{{근거 2-2}}</li></ul></div></div>
+      <div class="ex"><div class="no">03</div><div><div class="mn">{{주문 3}}</div><ul><li>{{근거 3-1}}</li><li>{{근거 3-2}}</li></ul></div></div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p03 | section_divider | 장 구분 | 본문이 10장을 넘을 때만 사용. 쪽 번호에 넣지 않는다 -->
+<section class="slide divider">
+  <div class="dv-no">{{장 번호}}</div>
+  <div class="dv-title">{{장 제목}}</div>
+  <div class="dv-sub">{{장에서 답하는 질문}}</div>
+</section>
+
+<!-- @part p04 | premise_conclusion | 전제와 귀결의 2단 | 왼쪽에 사실(표), 오른쪽에 그 사실이 뜻하는 바를 둘 때. 강한 인과가 있을 때만 삼각형을 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols arrow">
+      <div>
+        <div class="colh">{{왼쪽 열 제목}}</div>
+        <div class="fill up">
+          <table class="t">
+            <tr><td class="ax" style="width:150px">{{축 1}}</td><td>{{사실 1}}</td></tr>
+            <tr><td class="ax">{{축 2}}</td><td>{{사실 2}}</td></tr>
+            <tr><td class="ax">{{축 3}}</td><td>{{사실 3}}</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tri"></div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{귀결 1}}</li>
+            <li>{{귀결 2}}</li>
+            <li>{{귀결 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p05 | axis_table | 축 있는 표 | 항목(행)과 관점(열)으로 정리할 때. 카드 나열보다 먼저 검토한다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:190px">{{행 축 이름}}</th><th>{{열 1}}</th><th>{{열 2}}</th><th>{{열 3}}</th></tr>
+      <tr><td class="ax">{{항목 1}}</td><td>{{내용 1-1}}</td><td>{{내용 1-2}}</td><td>{{내용 1-3}}</td></tr>
+      <tr><td class="ax">{{항목 2}}</td><td>{{내용 2-1}}</td><td>{{내용 2-2}}</td><td>{{내용 2-3}}</td></tr>
+      <tr><td class="ax">{{항목 3}}</td><td>{{내용 3-1}}</td><td>{{내용 3-2}}</td><td>{{내용 3-3}}</td></tr>
+      <tr><td class="ax">{{항목 4}}</td><td>{{내용 4-1}}</td><td>{{내용 4-2}}</td><td>{{내용 4-3}}</td></tr>
+    </table>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p06 | ranked_bar_insight | 가로 막대와 시사점 | 항목 간 크기를 비교하고 한 항목만 강조할 때. 왼쪽에 도표, 오른쪽에 뜻하는 바 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="bars">
+          <div class="row on"><div class="nm">{{항목 1}}</div><div class="trk"><div class="bar" style="width:92%"></div></div><div class="val">{{값 1}}</div></div>
+          <div class="row"><div class="nm">{{항목 2}}</div><div class="trk"><div class="bar" style="width:61%"></div></div><div class="val">{{값 2}}</div></div>
+          <div class="row"><div class="nm">{{항목 3}}</div><div class="trk"><div class="bar" style="width:44%"></div></div><div class="val">{{값 3}}</div></div>
+          <div class="row"><div class="nm">{{항목 4}}</div><div class="trk"><div class="bar" style="width:27%"></div></div><div class="val">{{값 4}}</div></div>
+          <div class="row"><div class="nm">{{항목 5}}</div><div class="trk"><div class="bar" style="width:15%"></div></div><div class="val">{{값 5}}</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p07 | column_trend_insight | 세로 막대 추이와 시사점 | 시계열 추이를 보일 때. 막대 높이는 style의 height 비율로 조정하고, 전망치는 col에 fc를 붙인다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="colchart">
+          <div class="plot">
+            <div class="col"><div class="cv">{{값 1}}</div><div class="cb" style="height:22%"></div></div>
+            <div class="col"><div class="cv">{{값 2}}</div><div class="cb" style="height:35%"></div></div>
+            <div class="col"><div class="cv">{{값 3}}</div><div class="cb" style="height:51%"></div></div>
+            <div class="col"><div class="cv">{{값 4}}</div><div class="cb" style="height:68%"></div></div>
+            <div class="col on"><div class="cv">{{값 5}}</div><div class="cb" style="height:86%"></div></div>
+          </div>
+          <div class="xs"><div>{{시점 1}}</div><div>{{시점 2}}</div><div>{{시점 3}}</div><div>{{시점 4}}</div><div>{{시점 5}}</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p08 | composition_stack | 구성비 누적 막대와 표 | 전체에서 각 부분이 차지하는 비중을 보일 때. 조각 너비는 style의 width 비율로 조정한다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+    <div class="stack">
+      <div class="sg a" style="width:48%">{{비중 1}}</div>
+      <div class="sg b" style="width:27%">{{비중 2}}</div>
+      <div class="sg c" style="width:16%">{{비중 3}}</div>
+      <div class="sg d" style="width:9%">{{비중 4}}</div>
+    </div>
+    <div class="legend"><span><i class="a"></i>{{구분 1}}</span><span><i class="b"></i>{{구분 2}}</span><span><i class="c"></i>{{구분 3}}</span><span><i class="d"></i>{{구분 4}}</span></div>
+    <table class="t">
+      <tr><th style="width:190px">{{행 축 이름}}</th><th style="width:120px" class="num">{{수치 열}}</th><th>{{설명 열}}</th></tr>
+      <tr><td class="ax">{{구분 1}}</td><td class="num">{{수치 1}}</td><td>{{설명 1}}</td></tr>
+      <tr><td class="ax">{{구분 2}}</td><td class="num">{{수치 2}}</td><td>{{설명 2}}</td></tr>
+      <tr><td class="ax">{{구분 3}}</td><td class="num">{{수치 3}}</td><td>{{설명 3}}</td></tr>
+    </table>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p09 | kpi_row_readout | 핵심 수치와 읽는 법 | 수치 3~4개로 규모나 성과를 보일 때. 수치가 4개면 kpis에 k4를 붙인다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:30px">
+    <div class="kpis">
+      <div class="kpi"><div class="lb">{{지표 1}}</div><div class="v">{{수치 1}}</div><div class="ds">{{측정 조건 1}}</div></div>
+      <div class="kpi"><div class="lb">{{지표 2}}</div><div class="v">{{수치 2}}</div><div class="ds">{{측정 조건 2}}</div></div>
+      <div class="kpi"><div class="lb">{{지표 3}}</div><div class="v">{{수치 3}}</div><div class="ds">{{측정 조건 3}}</div></div>
+    </div>
+    <div>
+      <div class="colh">{{아래 열 제목}}</div>
+      <ul class="bl" style="margin-top:14px">
+        <li>{{읽는 법 1}}</li>
+        <li>{{읽는 법 2}}</li>
+        <li>{{읽는 법 3}}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p10 | chevron_steps | 단계 화살표 | 절차나 흐름만으로 한 장을 채울 때. 문제 단계 하나만 on으로 강조할 수 있다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:0">
+    <div class="chev">
+      <div class="cv"><span>{{단계 1}}</span></div>
+      <div class="cv"><span>{{단계 2}}</span></div>
+      <div class="cv"><span>{{단계 3}}</span></div>
+      <div class="cv"><span>{{단계 4}}</span></div>
+    </div>
+    <div class="chevx" style="flex:0 0 auto">
+      <div><div class="st">{{주체 1}}</div><ul class="bl"><li>{{내용 1-1}}</li><li>{{내용 1-2}}</li></ul></div>
+      <div><div class="st">{{주체 2}}</div><ul class="bl"><li>{{내용 2-1}}</li><li>{{내용 2-2}}</li></ul></div>
+      <div><div class="st">{{주체 3}}</div><ul class="bl"><li>{{내용 3-1}}</li><li>{{내용 3-2}}</li></ul></div>
+      <div><div class="st">{{주체 4}}</div><ul class="bl"><li>{{내용 4-1}}</li><li>{{내용 4-2}}</li></ul></div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p11 | problem_solution | 과제와 해결의 2열 | 고객의 과제와 제품의 해결을 대응시킬 때. 전후 시계열로 쓰지 않는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:170px">{{행 축 이름}}</th><th>과제</th><th>해결</th></tr>
+      <tr><td class="ax">{{관점 1}}</td><td>{{과제 1}}</td><td>{{해결 1}}</td></tr>
+      <tr><td class="ax">{{관점 2}}</td><td>{{과제 2}}</td><td>{{해결 2}}</td></tr>
+      <tr><td class="ax">{{관점 3}}</td><td>{{과제 3}}</td><td>{{해결 3}}</td></tr>
+    </table>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p12 | comparison_table | 경쟁 비교표 | 대안과 평가 축으로 비교할 때. 상대가 앞서는 축을 반드시 넣고, 기호의 뜻은 범례에 적는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t eq">
+      <tr><th style="width:210px">{{평가 축 이름}}</th><th class="ctr">{{자사}}</th><th class="ctr">{{대안 1}}</th><th class="ctr">{{대안 2}}</th><th class="ctr">{{대안 3}}</th></tr>
+      <tr><td class="ax">{{평가 축 1}}</td><td class="ctr"><span class="hb f"></span></td><td class="ctr"><span class="hb h"><i></i></span></td><td class="ctr"><span class="hb"></span></td><td class="ctr"><span class="hb h"><i></i></span></td></tr>
+      <tr><td class="ax">{{평가 축 2}}</td><td class="ctr"><span class="hb f"></span></td><td class="ctr"><span class="hb"></span></td><td class="ctr"><span class="hb h"><i></i></span></td><td class="ctr"><span class="hb"></span></td></tr>
+      <tr><td class="ax">{{평가 축 3}}</td><td class="ctr"><span class="hb h"><i></i></span></td><td class="ctr"><span class="hb f"></span></td><td class="ctr"><span class="hb f"></span></td><td class="ctr"><span class="hb h"><i></i></span></td></tr>
+      <tr><td class="ax">{{평가 축 4}}</td><td class="ctr"><span class="hb f"></span></td><td class="ctr"><span class="hb h"><i></i></span></td><td class="ctr"><span class="hb"></span></td><td class="ctr"><span class="hb f"></span></td></tr>
+    </table>
+    <div class="legend"><span><span class="hb f"></span>{{충족의 뜻}}</span><span><span class="hb h"><i></i></span>{{부분 충족의 뜻}}</span><span><span class="hb"></span>{{미충족의 뜻}}</span></div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p13 | matrix_2x2 | 2×2 포지셔닝 | 두 축 위에서 자사와 대안의 위치를 보일 때. 점 위치는 style의 left·top 비율로 조정한다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="mx">
+          <div class="ylab"><span>{{세로축 이름}} 높음</span></div>
+          <div class="plane">
+            <div class="vline"></div><div class="hline"></div>
+            <div class="pt on" style="left:72%;top:18%"><i></i><span>{{자사}}</span></div>
+            <div class="pt" style="left:24%;top:26%"><i></i><span>{{대안 1}}</span></div>
+            <div class="pt" style="left:64%;top:70%"><i></i><span>{{대안 2}}</span></div>
+            <div class="pt" style="left:18%;top:76%"><i></i><span>{{대안 3}}</span></div>
+          </div>
+          <div class="xlab"><span>낮음</span><span>{{가로축 이름}}</span><span>높음</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{읽는 법 1}}</li>
+            <li>{{읽는 법 2}}</li>
+            <li>{{읽는 법 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p14 | calc_flow | 계산 흐름 | 바텀업 시장 규모나 단위 경제성처럼 계산 근거를 식으로 보일 때 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:28px">
+    <div class="calc">
+      <div class="cx"><div class="lb">{{항 1 이름}}</div><div class="v">{{항 1 값}}</div><div class="ds">{{항 1 근거}}</div></div>
+      <div class="op">×</div>
+      <div class="cx"><div class="lb">{{항 2 이름}}</div><div class="v">{{항 2 값}}</div><div class="ds">{{항 2 근거}}</div></div>
+      <div class="op">×</div>
+      <div class="cx"><div class="lb">{{항 3 이름}}</div><div class="v">{{항 3 값}}</div><div class="ds">{{항 3 근거}}</div></div>
+      <div class="op">=</div>
+      <div class="cx res"><div class="lb">{{결과 이름}}</div><div class="v">{{결과 값}}</div><div class="ds">{{결과 설명}}</div></div>
+    </div>
+    <div>
+      <div class="colh">{{아래 열 제목}}</div>
+      <ul class="bl" style="margin-top:14px">
+        <li>{{가정 1}}</li>
+        <li>{{가정 2}}</li>
+        <li>{{가정 3}}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p15 | claim_panel_evidence | 주장 패널과 근거 | 수치 하나를 크게 세우고 오른쪽에 근거 표를 둘 때 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="side">
+      <div class="sp"><div class="sl">{{수치 라벨}}</div><div class="sn">{{큰 수치}}</div><div class="sm">{{수치의 뜻}}</div></div>
+      <div class="sb">
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:6px">
+          <table class="t tall">
+            <tr><td class="ax" style="width:160px">{{근거 축 1}}</td><td>{{근거 1}}</td></tr>
+            <tr><td class="ax">{{근거 축 2}}</td><td>{{근거 2}}</td></tr>
+            <tr><td class="ax">{{근거 축 3}}</td><td>{{근거 3}}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p16 | product_shot | 제품 화면과 설명 | 제품이 무엇인지 화면으로 보일 때. shot 안의 span을 img 태그로 바꾼다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="shot"><span>{{제품 화면 이미지 자리}}</span></div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <table class="t">
+            <tr><td class="ax" style="width:120px">{{기능 1}}</td><td>{{사용자가 얻는 것 1}}</td></tr>
+            <tr><td class="ax">{{기능 2}}</td><td>{{사용자가 얻는 것 2}}</td></tr>
+            <tr><td class="ax">{{기능 3}}</td><td>{{사용자가 얻는 것 3}}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p17 | case_study | 도입 사례 | 고객 한 곳의 과제, 해결, 성과를 보일 때. 성과 수치에는 측정 조건을 적는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="colh">{{왼쪽 열 제목}}</div>
+        <div class="fill up">
+          <table class="t">
+            <tr><td class="ax" style="width:120px">고객</td><td>{{고객 설명}}</td></tr>
+            <tr><td class="ax">과제</td><td>{{과제}}</td></tr>
+            <tr><td class="ax">해결</td><td>{{해결}}</td></tr>
+            <tr><td class="ax">도입 기간</td><td>{{도입 기간}}</td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <div class="kpis k2">
+            <div class="kpi"><div class="lb">{{성과 지표 1}}</div><div class="v acc">{{성과 수치 1}}</div><div class="ds">{{측정 조건 1}}</div></div>
+            <div class="kpi"><div class="lb">{{성과 지표 2}}</div><div class="v acc">{{성과 수치 2}}</div><div class="ds">{{측정 조건 2}}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p18 | pricing_table | 요금제 표 | 요금제나 도입 방식을 열로 놓고 비교할 때. 권하는 열 하나만 머리글을 강조색으로 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t eq">
+      <tr><th style="width:190px">{{행 축 이름}}</th><th>{{요금제 1}}</th><th><span class="acc">{{요금제 2}}</span></th><th>{{요금제 3}}</th></tr>
+      <tr><td class="ax">{{대상}}</td><td>{{대상 1}}</td><td>{{대상 2}}</td><td>{{대상 3}}</td></tr>
+      <tr><td class="ax">{{가격}}</td><td class="big">{{가격 1}}</td><td class="big">{{가격 2}}</td><td class="big">{{가격 3}}</td></tr>
+      <tr><td class="ax">{{포함 범위}}</td><td>{{범위 1}}</td><td>{{범위 2}}</td><td>{{범위 3}}</td></tr>
+      <tr><td class="ax">{{지원}}</td><td>{{지원 1}}</td><td>{{지원 2}}</td><td>{{지원 3}}</td></tr>
+    </table>
+  </div>
+  <div class="src">{{가격 조건 주석}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p19 | roadmap_table | 로드맵 | 시기(열)와 영역(행)으로 계획을 보일 때. 지금 시기의 열은 th에 acc를 쓴다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t eq tall">
+      <tr><th style="width:170px">{{행 축 이름}}</th><th>{{시기 1}}</th><th>{{시기 2}}</th><th>{{시기 3}}</th><th>{{시기 4}}</th></tr>
+      <tr><td class="ax">{{영역 1}}</td><td>{{계획 1-1}}</td><td>{{계획 1-2}}</td><td>{{계획 1-3}}</td><td>{{계획 1-4}}</td></tr>
+      <tr><td class="ax">{{영역 2}}</td><td>{{계획 2-1}}</td><td>{{계획 2-2}}</td><td>{{계획 2-3}}</td><td>{{계획 2-4}}</td></tr>
+      <tr><td class="ax">{{영역 3}}</td><td>{{계획 3-1}}</td><td>{{계획 3-2}}</td><td>{{계획 3-3}}</td><td>{{계획 3-4}}</td></tr>
+      <tr><td class="ax">{{달성 지표}}</td><td><b>{{지표 1}}</b></td><td><b>{{지표 2}}</b></td><td><b>{{지표 3}}</b></td><td><b>{{지표 4}}</b></td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p20 | team_table | 팀 | 구성원의 역할과 이 사업에 맞는 이력을 보일 때. 평가하는 말 없이 사실만 적는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:170px">이름</th><th style="width:190px">역할</th><th>이 사업과 관련된 이력</th></tr>
+      <tr><td class="ax">{{이름 1}}</td><td>{{역할 1}}</td><td>{{이력 1}}</td></tr>
+      <tr><td class="ax">{{이름 2}}</td><td>{{역할 2}}</td><td>{{이력 2}}</td></tr>
+      <tr><td class="ax">{{이름 3}}</td><td>{{역할 3}}</td><td>{{이력 3}}</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p21 | ask_use_of_funds | 투자 요청과 자금 사용 | 조달 금액, 사용 계획, 도달 지점을 보일 때 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="side">
+      <div class="sp"><div class="sl">{{라운드 이름}}</div><div class="sn">{{조달 금액}}</div><div class="sm">{{이 자금으로 도달하는 지점}}</div></div>
+      <div class="sb">
+        <div class="axh"><span>자금 사용 계획</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="bars">
+          <div class="row on"><div class="nm">{{용도 1}}</div><div class="trk"><div class="bar" style="width:90%"></div></div><div class="val">{{금액 1}}</div></div>
+          <div class="row"><div class="nm">{{용도 2}}</div><div class="trk"><div class="bar" style="width:56%"></div></div><div class="val">{{금액 2}}</div></div>
+          <div class="row"><div class="nm">{{용도 3}}</div><div class="trk"><div class="bar" style="width:34%"></div></div><div class="val">{{금액 3}}</div></div>
+          <div class="row"><div class="nm">{{용도 4}}</div><div class="trk"><div class="bar" style="width:18%"></div></div><div class="val">{{금액 4}}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p22 | next_steps | 다음 단계 제안 | 영업 덱의 마지막 본문. 진행 방식, 산출물, 상대에게 부탁할 일을 표로 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:150px">{{시기}}</th><th>진행 내용</th><th>산출물</th><th>{{상대 회사}}에 부탁드릴 일</th></tr>
+      <tr><td class="ax">{{시기 1}}</td><td>{{진행 1}}</td><td>{{산출물 1}}</td><td>{{부탁 1}}</td></tr>
+      <tr><td class="ax">{{시기 2}}</td><td>{{진행 2}}</td><td>{{산출물 2}}</td><td>{{부탁 2}}</td></tr>
+      <tr><td class="ax">{{시기 3}}</td><td>{{진행 3}}</td><td>{{산출물 3}}</td><td>{{부탁 3}}</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p23 | two_column_text | 좌우 2단 글머리표 | 같은 구조의 두 묶음을 나란히 둘 때. 줄 대응을 읽혀야 하면 표(p05)를 쓴다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols eq">
+      <div>
+        <div class="colh">{{왼쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{왼쪽 1}}</li>
+            <li>{{왼쪽 2}}</li>
+            <li>{{왼쪽 3}}</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{오른쪽 1}}</li>
+            <li>{{오른쪽 2}}</li>
+            <li>{{오른쪽 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p25 | logo_wall | 로고 모음과 요약 | 고객사, 제휴사, 투자사를 로고로 보일 때. 로고는 scripts/logo.py로 만든 투명 PNG를 쓰고, 실어도 되는지 확인된 회사만 싣는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:26px">
+    <div>
+      <div class="axh"><span>{{로고 묶음 이름}}</span><span class="u">{{기준 시점, 가나다순}}</span></div>
+      <div class="logos">
+        <div class="lg"><span>{{로고 1}}</span></div>
+        <div class="lg"><span>{{로고 2}}</span></div>
+        <div class="lg"><span>{{로고 3}}</span></div>
+        <div class="lg"><span>{{로고 4}}</span></div>
+        <div class="lg"><span>{{로고 5}}</span></div>
+        <div class="lg"><span>{{로고 6}}</span></div>
+        <div class="lg"><span>{{로고 7}}</span></div>
+        <div class="lg"><span>{{로고 8}}</span></div>
+        <div class="lg"><span>{{로고 9}}</span></div>
+        <div class="lg"><span>{{로고 10}}</span></div>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="lb">{{지표 1}}</div><div class="v">{{수치 1}}</div><div class="ds">{{측정 조건 1}}</div></div>
+      <div class="kpi"><div class="lb">{{지표 2}}</div><div class="v">{{수치 2}}</div><div class="ds">{{측정 조건 2}}</div></div>
+      <div class="kpi"><div class="lb">{{지표 3}}</div><div class="v">{{수치 3}}</div><div class="ds">{{측정 조건 3}}</div></div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p26 | waterfall | 폭포 (증감 브리지) | 시작값에서 끝값까지 무엇이 얼마나 더하고 뺐는지 보일 때. 막대의 bottom과 height, 값의 bottom을 %로 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="wf">
+          <div class="plot">
+            <div class="col tot"><div class="wv" style="bottom:calc(40% + 5px)">{{시작값}}</div><div class="wb" style="bottom:0;height:40%"></div></div>
+            <div class="col up"><div class="wv" style="bottom:calc(62% + 5px)">{{증가 1}}</div><div class="wb" style="bottom:40%;height:22%"></div></div>
+            <div class="col up"><div class="wv" style="bottom:calc(78% + 5px)">{{증가 2}}</div><div class="wb" style="bottom:62%;height:16%"></div></div>
+            <div class="col dn"><div class="wv" style="bottom:calc(78% + 5px)">{{감소 1}}</div><div class="wb" style="bottom:66%;height:12%"></div></div>
+            <div class="col up"><div class="wv" style="bottom:calc(86% + 5px)">{{증가 3}}</div><div class="wb" style="bottom:66%;height:20%"></div></div>
+            <div class="col tot"><div class="wv" style="bottom:calc(86% + 5px)">{{끝값}}</div><div class="wb" style="bottom:0;height:86%"></div></div>
+          </div>
+          <div class="xs"><div>{{시작 시점}}</div><div>{{요인 1}}</div><div>{{요인 2}}</div><div>{{요인 3}}</div><div>{{요인 4}}</div><div>{{끝 시점}}</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p27 | stacked_column | 누적 세로 막대 | 시간에 따라 전체와 구성이 함께 바뀌는 것을 보일 때. 조각의 height를 %로 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="stk">
+          <div class="plot">
+            <div class="col"><div class="tv">{{합계 1}}</div><div class="sg c" style="height:10%">{{c1}}</div><div class="sg b" style="height:12%">{{b1}}</div><div class="sg a" style="height:16%">{{a1}}</div></div>
+            <div class="col"><div class="tv">{{합계 2}}</div><div class="sg c" style="height:13%">{{c2}}</div><div class="sg b" style="height:18%">{{b2}}</div><div class="sg a" style="height:20%">{{a2}}</div></div>
+            <div class="col"><div class="tv">{{합계 3}}</div><div class="sg c" style="height:15%">{{c3}}</div><div class="sg b" style="height:27%">{{b3}}</div><div class="sg a" style="height:24%">{{a3}}</div></div>
+            <div class="col"><div class="tv">{{합계 4}}</div><div class="sg c" style="height:16%">{{c4}}</div><div class="sg b" style="height:40%">{{b4}}</div><div class="sg a" style="height:28%">{{a4}}</div></div>
+          </div>
+          <div class="xs" style="gap:30px;padding-left:24px;padding-right:24px"><div>{{시점 1}}</div><div>{{시점 2}}</div><div>{{시점 3}}</div><div>{{시점 4}}</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="a"></i>{{계열 A}}</span><span><i class="b"></i>{{계열 B}}</span><span><i class="c"></i>{{계열 C}}</span></div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p28 | grouped_column | 묶음 세로 막대 | 두 계열(자사와 비교 대상, 도입 전과 후)을 항목마다 나란히 비교할 때. i의 height를 %로 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="grp">
+          <div class="plot">
+            <div class="g"><div class="b"><span>{{값 1-1}}</span><i style="height:46%"></i></div><div class="b on"><span>{{값 1-2}}</span><i style="height:78%"></i></div></div>
+            <div class="g"><div class="b"><span>{{값 2-1}}</span><i style="height:38%"></i></div><div class="b on"><span>{{값 2-2}}</span><i style="height:64%"></i></div></div>
+            <div class="g"><div class="b"><span>{{값 3-1}}</span><i style="height:52%"></i></div><div class="b on"><span>{{값 3-2}}</span><i style="height:58%"></i></div></div>
+            <div class="g"><div class="b"><span>{{값 4-1}}</span><i style="height:30%"></i></div><div class="b on"><span>{{값 4-2}}</span><i style="height:71%"></i></div></div>
+          </div>
+          <div class="xs" style="gap:34px;padding-left:24px;padding-right:24px"><div>{{항목 1}}</div><div>{{항목 2}}</div><div>{{항목 3}}</div><div>{{항목 4}}</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="c"></i>{{비교 계열}}</span><span><i class="b"></i>{{강조 계열}}</span></div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p29 | funnel | 깔때기 | 단계마다 얼마나 남고 빠지는지 보일 때. 막대의 width를 %로 고치고, 헤드메시지가 말하는 단계에만 on을 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="fnl">
+          <div class="row first"><div class="nm">{{단계 1}}</div><div class="trk"><div class="fb" style="width:100%">{{수 1}}</div></div><div class="rt">{{기준}}</div></div>
+          <div class="row"><div class="nm">{{단계 2}}</div><div class="trk"><div class="fb" style="width:68%">{{수 2}}</div></div><div class="rt">앞 단계의 <b>{{비율 2}}</b></div></div>
+          <div class="row on"><div class="nm">{{단계 3}}</div><div class="trk"><div class="fb" style="width:31%">{{수 3}}</div></div><div class="rt">앞 단계의 <b>{{비율 3}}</b></div></div>
+          <div class="row"><div class="nm">{{단계 4}}</div><div class="trk"><div class="fb" style="width:19%">{{수 4}}</div></div><div class="rt">앞 단계의 <b>{{비율 4}}</b></div></div>
+          <div class="row"><div class="nm">{{단계 5}}</div><div class="trk"><div class="fb" style="width:12%">{{수 5}}</div></div><div class="rt">앞 단계의 <b>{{비율 5}}</b></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p30 | scatter | 분산형 | 두 변수의 관계와 그 안에서 자사의 자리를 보일 때. 점의 left와 top을 %로 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{세로축 지표}} (세로), {{가로축 지표}} (가로)</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="sc" style="margin-top:10px">
+          <div class="yt"><span>{{y 최대}}</span><span>{{y 중간}}</span><span>0</span></div>
+          <div class="plane">
+            <div class="gl" style="top:0"></div><div class="gl" style="top:50%"></div>
+            <div class="pt" style="left:12%;top:74%"><i></i><span>{{대상 1}}</span></div>
+            <div class="pt" style="left:26%;top:60%"><i></i><span>{{대상 2}}</span></div>
+            <div class="pt" style="left:38%;top:52%"><i></i><span>{{대상 3}}</span></div>
+            <div class="pt" style="left:52%;top:38%"><i></i><span>{{대상 4}}</span></div>
+            <div class="pt" style="left:63%;top:30%"><i></i><span>{{대상 5}}</span></div>
+            <div class="pt on" style="left:44%;top:14%"><i></i><span>{{자사}}</span></div>
+          </div>
+          <div class="xt"><span>0</span><span>{{x 중간}}</span><span>{{x 최대}}</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p31 | bubble | 버블 | 두 변수의 자리에 더해 크기(시장 규모, 매출)까지 함께 보일 때. 점의 left·top과 i의 width·height를 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{세로축 지표}} (세로), {{가로축 지표}} (가로), 원의 크기는 {{크기 지표}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="sc" style="margin-top:10px">
+          <div class="yt"><span>{{y 최대}}</span><span>{{y 중간}}</span><span>0</span></div>
+          <div class="plane">
+            <div class="gl" style="top:0"></div><div class="gl" style="top:50%"></div>
+            <div class="ref" style="left:50%"></div>
+            <div class="pt" style="left:10%;top:62%"><i style="width:64px;height:64px"></i><span>{{대상 1}}</span></div>
+            <div class="pt" style="left:34%;top:44%"><i style="width:40px;height:40px"></i><span>{{대상 2}}</span></div>
+            <div class="pt" style="left:58%;top:58%"><i style="width:26px;height:26px"></i><span>{{대상 3}}</span></div>
+            <div class="pt on" style="left:62%;top:14%"><i style="width:34px;height:34px"></i><span>{{자사}}</span></div>
+          </div>
+          <div class="xt"><span>0</span><span>{{x 중간}}</span><span>{{x 최대}}</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p32 | dot_trend | 점 추이 (꺾은선 대신) | 두 계열의 추이를 시점마다 비교할 때. 꺾은선은 PPTX에서 그림이 되므로 점과 값으로 그린다. 점의 bottom을 %로 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>{{지표 이름}}</span><span class="u">{{단위, 기간}}</span></div>
+        <div class="dots">
+          <div class="plot">
+            <div class="col"><div class="d on" style="bottom:22%"><span>{{a1}}</span><i></i></div><div class="d" style="bottom:8%"><span>{{b1}}</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:36%"><span>{{a2}}</span><i></i></div><div class="d" style="bottom:12%"><span>{{b2}}</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:52%"><span>{{a3}}</span><i></i></div><div class="d" style="bottom:17%"><span>{{b3}}</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:66%"><span>{{a4}}</span><i></i></div><div class="d" style="bottom:21%"><span>{{b4}}</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:80%"><span>{{a5}}</span><i></i></div><div class="d" style="bottom:24%"><span>{{b5}}</span><i></i></div></div>
+          </div>
+          <div class="xs"><div>{{시점 1}}</div><div>{{시점 2}}</div><div>{{시점 3}}</div><div>{{시점 4}}</div><div>{{시점 5}}</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="b"></i>{{강조 계열}}</span><span><i class="c"></i>{{비교 계열}}</span></div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p33 | issue_tree | 이슈 트리 | 큰 질문을 겹치지 않는 하위 질문으로 나눠 보일 때. 가지마다 답이나 다루는 쪽을 적는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="tree">
+      <div class="root"><div class="rb">{{핵심 질문}}</div></div>
+      <div class="ln"></div>
+      <div class="brs">
+        <div class="br"><div class="vt"></div><div class="in"><div class="ln"></div><div class="bb">{{하위 질문 1}}</div><div class="ln"></div><div class="lfs">
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 1-1}}</span></div>
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 1-2}}</span></div>
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 1-3}}</span></div></div></div></div>
+        <div class="br"><div class="vt"></div><div class="in"><div class="ln"></div><div class="bb">{{하위 질문 2}}</div><div class="ln"></div><div class="lfs">
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 2-1}}</span></div>
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 2-2}}</span></div>
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 2-3}}</span></div></div></div></div>
+        <div class="br"><div class="vt"></div><div class="in"><div class="ln"></div><div class="bb">{{하위 질문 3}}</div><div class="ln"></div><div class="lfs">
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 3-1}}</span></div>
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 3-2}}</span></div>
+          <div class="lf"><div class="ln"></div><span>{{세부 질문 3-3}}</span></div></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p34 | value_chain | 가치 사슬과 범위 | 산업의 단계 위에서 자사와 다른 회사가 맡는 범위를 보일 때. 띠의 grid-column으로 범위를 고친다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:14px">
+    <div class="chev">
+      <div class="cv"><span>{{단계 1}}</span></div><div class="cv"><span>{{단계 2}}</span></div><div class="cv"><span>{{단계 3}}</span></div><div class="cv"><span>{{단계 4}}</span></div><div class="cv"><span>{{단계 5}}</span></div>
+    </div>
+    <div class="band">
+      <div class="lb">{{자사}}</div>
+      <div class="bd on" style="grid-column:2/5">{{자사가 맡는 범위}}</div>
+    </div>
+    <div class="band">
+      <div class="lb">{{다른 회사 1}}</div>
+      <div class="bd" style="grid-column:1/3">{{범위 1}}</div><div class="bd no" style="grid-column:3/6">{{맡지 않는 범위}}</div>
+    </div>
+    <div class="band">
+      <div class="lb">{{다른 회사 2}}</div>
+      <div class="bd no" style="grid-column:1/4">{{맡지 않는 범위}}</div><div class="bd" style="grid-column:4/6">{{범위 2}}</div>
+    </div>
+    <div class="chevx" style="flex:0 0 auto;margin-top:6px">
+      <div><div class="st">{{단계 1}}에서 일어나는 일</div><ul class="bl sm"><li>{{내용 1}}</li></ul></div>
+      <div><div class="st">{{단계 2}}</div><ul class="bl sm"><li>{{내용 2}}</li></ul></div>
+      <div><div class="st">{{단계 3}}</div><ul class="bl sm"><li>{{내용 3}}</li></ul></div>
+      <div><div class="st">{{단계 4}}</div><ul class="bl sm"><li>{{내용 4}}</li></ul></div>
+      <div><div class="st">{{단계 5}}</div><ul class="bl sm"><li>{{내용 5}}</li></ul></div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p35 | cycle | 순환 사이클 | 한 바퀴 돌 때마다 강해지는 구조(데이터 순환, 성장 고리)를 보일 때. 시계 방향으로 읽는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="cyc">
+          <div class="nd on"><div class="st">{{단계 1의 주체}}</div><div class="nt">{{단계 1}}</div><div class="nx">{{단계 1에서 일어나는 일}}</div></div>
+          <div class="ar"><div class="tri"></div></div>
+          <div class="nd"><div class="st">{{단계 2의 주체}}</div><div class="nt">{{단계 2}}</div><div class="nx">{{단계 2에서 일어나는 일}}</div></div>
+          <div class="ar"><div class="tri u"></div></div>
+          <div class="mid"></div>
+          <div class="ar"><div class="tri d"></div></div>
+          <div class="nd"><div class="st">{{단계 4의 주체}}</div><div class="nt">{{단계 4}}</div><div class="nx">{{단계 4에서 일어나는 일}}</div></div>
+          <div class="ar"><div class="tri l"></div></div>
+          <div class="nd"><div class="st">{{단계 3의 주체}}</div><div class="nt">{{단계 3}}</div><div class="nx">{{단계 3에서 일어나는 일}}</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>{{시사점 1}}</li>
+            <li>{{시사점 2}}</li>
+            <li>{{시사점 3}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p36 | pillars_foundation | 기둥과 토대 | 하나의 목표를 받치는 서너 개의 축과 그 밑바탕을 보일 때 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="plr">
+      <div class="roof">{{이루려는 것}}</div>
+      <div class="ps">
+        <div class="p"><div class="pn">01</div><div class="pt">{{축 1}}</div><ul class="bl sm"><li>{{내용 1-1}}</li><li>{{내용 1-2}}</li><li>{{내용 1-3}}</li></ul></div>
+        <div class="p"><div class="pn">02</div><div class="pt">{{축 2}}</div><ul class="bl sm"><li>{{내용 2-1}}</li><li>{{내용 2-2}}</li><li>{{내용 2-3}}</li></ul></div>
+        <div class="p"><div class="pn">03</div><div class="pt">{{축 3}}</div><ul class="bl sm"><li>{{내용 3-1}}</li><li>{{내용 3-2}}</li><li>{{내용 3-3}}</li></ul></div>
+      </div>
+      <div class="base"><b>{{토대 이름}}</b><span>{{토대의 내용}}</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p37 | heatmap_table | 히트맵 표 | 항목과 관점이 많은 표에서 강하고 약한 곳을 색의 농도로 보일 때. 칸의 h0~h3으로 농도를 정하고 범례에 뜻을 적는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t eq heat">
+      <tr><th style="width:200px">{{행 축 이름}}</th><th class="ctr">{{관점 1}}</th><th class="ctr">{{관점 2}}</th><th class="ctr">{{관점 3}}</th><th class="ctr">{{관점 4}}</th><th class="ctr">{{관점 5}}</th></tr>
+      <tr><td class="ax">{{항목 1}}</td><td class="h3">{{값}}</td><td class="h2">{{값}}</td><td class="h1">{{값}}</td><td class="h3">{{값}}</td><td class="h0">{{값}}</td></tr>
+      <tr><td class="ax">{{항목 2}}</td><td class="h2">{{값}}</td><td class="h3">{{값}}</td><td class="h2">{{값}}</td><td class="h1">{{값}}</td><td class="h1">{{값}}</td></tr>
+      <tr><td class="ax">{{항목 3}}</td><td class="h1">{{값}}</td><td class="h1">{{값}}</td><td class="h3">{{값}}</td><td class="h2">{{값}}</td><td class="h0">{{값}}</td></tr>
+      <tr><td class="ax">{{항목 4}}</td><td class="h0">{{값}}</td><td class="h2">{{값}}</td><td class="h1">{{값}}</td><td class="h3">{{값}}</td><td class="h2">{{값}}</td></tr>
+    </table>
+    <div class="legend"><span><i class="h3"></i>{{가장 짙은 색의 뜻}}</span><span><i class="h2"></i>{{중간 색의 뜻}}</span><span><i class="h1"></i>{{옅은 색의 뜻}}</span></div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p38 | gantt | 간트 차트 | 작업마다 시작과 끝을 기간 위에 보일 때. 막대는 g 칸의 colspan으로 길이를 정하고, 지금 하는 작업에만 on을 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t gantt">
+      <tr><th style="width:230px">{{작업}}</th><th>{{기간 1}}</th><th>{{기간 2}}</th><th>{{기간 3}}</th><th>{{기간 4}}</th><th>{{기간 5}}</th><th>{{기간 6}}</th><th>{{기간 7}}</th><th>{{기간 8}}</th></tr>
+      <tr><td class="ax">{{작업 1}}</td><td class="g on" colspan="2">{{산출물 1}}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="ax">{{작업 2}}</td><td></td><td class="g" colspan="3">{{산출물 2}}</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="ax">{{작업 3}}</td><td></td><td></td><td></td><td class="g" colspan="3">{{산출물 3}}</td><td></td><td></td></tr>
+      <tr><td class="ax">{{작업 4}}</td><td></td><td></td><td></td><td></td><td></td><td class="g" colspan="3">{{산출물 4}}</td></tr>
+      <tr><td class="ax">{{점검 시점}}</td><td></td><td class="ms">{{점검 1}}</td><td></td><td></td><td class="ms">{{점검 2}}</td><td></td><td></td><td class="ms">{{점검 3}}</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p39 | current_target | 현재와 목표 상태 | 지금의 모습과 도달하려는 모습을 같은 관점으로 나란히 보일 때 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols arrow" style="grid-template-columns:1fr 22px 1fr">
+      <div>
+        <div class="colh">{{현재 시점}}의 모습</div>
+        <div class="fill up">
+          <table class="t">
+            <tr><td class="ax" style="width:130px">{{관점 1}}</td><td>{{현재 1}}</td></tr>
+            <tr><td class="ax">{{관점 2}}</td><td>{{현재 2}}</td></tr>
+            <tr><td class="ax">{{관점 3}}</td><td>{{현재 3}}</td></tr>
+            <tr><td class="ax">{{관점 4}}</td><td>{{현재 4}}</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tri"></div>
+      <div>
+        <div class="colh">{{목표 시점}}의 모습</div>
+        <div class="fill up">
+          <table class="t">
+            <tr><td class="ax" style="width:130px">{{관점 1}}</td><td><b>{{목표 1}}</b></td></tr>
+            <tr><td class="ax">{{관점 2}}</td><td><b>{{목표 2}}</b></td></tr>
+            <tr><td class="ax">{{관점 3}}</td><td><b>{{목표 3}}</b></td></tr>
+            <tr><td class="ax">{{관점 4}}</td><td><b>{{목표 4}}</b></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p40 | scr | 상황, 난점, 해결 | 읽는 사람이 이미 아는 상황에서 출발해 난점과 해결로 이끌 때. 덱의 첫머리나 제안의 요약에 쓴다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols w3 accent3">
+      <div>
+        <div class="colh">상황</div>
+        <div class="fill up"><ul class="bl"><li>{{상황 1}}</li><li>{{상황 2}}</li><li>{{상황 3}}</li></ul></div>
+      </div>
+      <div>
+        <div class="colh">난점</div>
+        <div class="fill up"><ul class="bl"><li>{{난점 1}}</li><li>{{난점 2}}</li><li>{{난점 3}}</li></ul></div>
+      </div>
+      <div>
+        <div class="colh">해결</div>
+        <div class="fill up"><ul class="bl"><li><b>{{해결 1}}</b></li><li>{{해결 2}}</li><li>{{해결 3}}</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p41 | org_chart | 조직도 | 역할과 보고 관계를 보일 때. 3열이면 row에 c3을 붙이고 bar4를 bar3으로 바꾼다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="oc">
+      <div class="topb"><div class="on1">{{대표 이름}}</div><div class="on2">{{직함}}</div></div>
+      <div class="stem"></div>
+      <div class="bar4"></div>
+      <div class="row">
+        <div class="u"><div class="stem"></div><div class="ub"><div class="un1">{{조직 1}}</div><div class="un2">{{책임자 1}}</div></div><ul class="bl sm"><li>{{맡은 일 1-1}}</li><li>{{맡은 일 1-2}}</li></ul></div>
+        <div class="u"><div class="stem"></div><div class="ub"><div class="un1">{{조직 2}}</div><div class="un2">{{책임자 2}}</div></div><ul class="bl sm"><li>{{맡은 일 2-1}}</li><li>{{맡은 일 2-2}}</li></ul></div>
+        <div class="u"><div class="stem"></div><div class="ub"><div class="un1">{{조직 3}}</div><div class="un2">{{책임자 3}}</div></div><ul class="bl sm"><li>{{맡은 일 3-1}}</li><li>{{맡은 일 3-2}}</li></ul></div>
+        <div class="u"><div class="stem"></div><div class="ub"><div class="un1">{{조직 4}}</div><div class="un2">{{책임자 4}}</div></div><ul class="bl sm"><li>{{맡은 일 4-1}}</li><li>{{맡은 일 4-2}}</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p42 | decision_fork | 분기와 판단 | 결정을 요청할 때. 왼쪽에 결정할 것과 전제, 오른쪽에 선택지마다의 조건과 결과를 두고 권하는 선택지의 행에 focus를 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols arrow" style="grid-template-columns:0.72fr 22px 1.6fr">
+      <div>
+        <div class="colh">결정할 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li><b>{{결정할 질문}}</b></li>
+            <li>{{전제 1}}</li>
+            <li>{{전제 2}}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tri"></div>
+      <div>
+        <div class="fill up" style="padding-top:0">
+          <table class="t tall">
+            <tr><th style="width:150px">선택지</th><th>필요한 조건</th><th>예상 결과</th><th style="width:110px">판단</th></tr>
+            <tr class="focus"><td class="ax">{{선택지 1}}</td><td>{{조건 1}}</td><td>{{결과 1}}</td><td><b>권고</b></td></tr>
+            <tr><td class="ax">{{선택지 2}}</td><td>{{조건 2}}</td><td>{{결과 2}}</td><td>{{판단 2}}</td></tr>
+            <tr><td class="ax">{{선택지 3}}</td><td>{{조건 3}}</td><td>{{결과 3}}</td><td>{{판단 3}}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p43 | risk_table | 위험과 대응 | 위험을 보일 때. 가능성과 영향의 크기, 미리 알 수 있는 신호, 대응을 함께 싣는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t">
+      <tr><th style="width:190px">위험</th><th class="ctr" style="width:90px">가능성</th><th class="ctr" style="width:90px">영향</th><th>미리 알 수 있는 신호</th><th>대응</th></tr>
+      <tr><td class="ax">{{위험 1}}</td><td class="ctr"><span class="hb f"></span></td><td class="ctr"><span class="hb h"><i></i></span></td><td>{{신호 1}}</td><td>{{대응 1}}</td></tr>
+      <tr><td class="ax">{{위험 2}}</td><td class="ctr"><span class="hb h"><i></i></span></td><td class="ctr"><span class="hb f"></span></td><td>{{신호 2}}</td><td>{{대응 2}}</td></tr>
+      <tr><td class="ax">{{위험 3}}</td><td class="ctr"><span class="hb"></span></td><td class="ctr"><span class="hb f"></span></td><td>{{신호 3}}</td><td>{{대응 3}}</td></tr>
+      <tr><td class="ax">{{위험 4}}</td><td class="ctr"><span class="hb h"><i></i></span></td><td class="ctr"><span class="hb"></span></td><td>{{신호 4}}</td><td>{{대응 4}}</td></tr>
+    </table>
+    <div class="legend"><span><span class="hb f"></span>높음</span><span><span class="hb h"><i></i></span>중간</span><span><span class="hb"></span>낮음</span></div>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p44 | scenario_table | 시나리오 비교표 | 가정이 달라질 때 결과가 어떻게 달라지는지 보일 때. 기준으로 삼는 시나리오의 머리글에만 acc를 둔다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t eq">
+      <tr><th style="width:210px">{{행 축 이름}}</th><th>보수적</th><th><span class="acc">기준</span></th><th>낙관적</th></tr>
+      <tr><td class="ax">{{가정 1}}</td><td>{{보수 1}}</td><td>{{기준 1}}</td><td>{{낙관 1}}</td></tr>
+      <tr><td class="ax">{{가정 2}}</td><td>{{보수 2}}</td><td>{{기준 2}}</td><td>{{낙관 2}}</td></tr>
+      <tr><td class="ax">{{가정 3}}</td><td>{{보수 3}}</td><td>{{기준 3}}</td><td>{{낙관 3}}</td></tr>
+      <tr><td class="ax">{{결과 지표}}</td><td class="big">{{보수 결과}}</td><td class="big">{{기준 결과}}</td><td class="big">{{낙관 결과}}</td></tr>
+    </table>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p45 | option_tradeoff | 선택지의 득실 | 선택지마다 얻는 것과 감수할 것을 나란히 놓고 판단을 적을 때 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:180px">선택지</th><th>얻는 것</th><th>감수할 것</th><th style="width:200px">판단</th></tr>
+      <tr class="focus"><td class="ax">{{선택지 1}}</td><td><ul><li>{{득 1-1}}</li><li>{{득 1-2}}</li></ul></td><td><ul><li>{{실 1-1}}</li><li>{{실 1-2}}</li></ul></td><td><b>{{판단 1}}</b></td></tr>
+      <tr><td class="ax">{{선택지 2}}</td><td><ul><li>{{득 2-1}}</li><li>{{득 2-2}}</li></ul></td><td><ul><li>{{실 2-1}}</li><li>{{실 2-2}}</li></ul></td><td>{{판단 2}}</td></tr>
+      <tr><td class="ax">{{선택지 3}}</td><td><ul><li>{{득 3-1}}</li><li>{{득 3-2}}</li></ul></td><td><ul><li>{{실 3-1}}</li><li>{{실 3-2}}</li></ul></td><td>{{판단 3}}</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p46 | numbered_actions | 번호 붙인 실행 과제 | 해야 할 일을 순서대로 보일 때. 번호는 뒤의 장에서 다시 가리킬 때만 쓴다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:64px"></th><th style="width:300px">과제</th><th>하는 일</th><th style="width:170px">담당과 기한</th></tr>
+      <tr><td class="no">1</td><td class="ax">{{과제 1}}</td><td>{{하는 일 1}}</td><td>{{담당 1}}</td></tr>
+      <tr><td class="no">2</td><td class="ax">{{과제 2}}</td><td>{{하는 일 2}}</td><td>{{담당 2}}</td></tr>
+      <tr><td class="no">3</td><td class="ax">{{과제 3}}</td><td>{{하는 일 3}}</td><td>{{담당 3}}</td></tr>
+      <tr><td class="no">4</td><td class="ax">{{과제 4}}</td><td>{{하는 일 4}}</td><td>{{담당 4}}</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p47 | customer_quote | 고객의 말 | 고객이나 이용자가 실제로 한 말을 근거로 세울 때. 말을 다듬거나 지어내지 않고, 누구의 말인지와 받은 경로를 적는다 -->
+<section class="slide">
+  <div class="top"><span class="brand">{{회사명}}</span><span class="kicker">{{키커}}</span></div>
+  <h1 class="title">{{헤드메시지}}</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1.5fr 1fr">
+      <div>
+        <div class="quote">
+          <div class="qt">{{고객이 한 말 그대로}}</div>
+          <div class="qa"><span><b>{{말한 사람}}</b>, {{직함과 소속}}</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">{{오른쪽 열 제목}}</div>
+        <div class="fill">
+          <div class="kpis k2">
+            <div class="kpi"><div class="lb">{{지표 1}}</div><div class="v acc">{{수치 1}}</div><div class="ds">{{측정 조건 1}}</div></div>
+            <div class="kpi"><div class="lb">{{지표 2}}</div><div class="v acc">{{수치 2}}</div><div class="ds">{{측정 조건 2}}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: {{출처}}</div>
+  <div class="foot"><span>{{꼬리말}}</span><span class="pg">0</span></div>
+</section>
+
+<!-- @part p24 | back_cover | 뒤표지 | 덱의 마지막 장. 메시지를 싣지 않고 연락처만 둔다 -->
+<section class="slide back">
+  <div class="cv-l"></div>
+  <div class="bk-brand">{{회사명}}</div>
+  <div class="bk-rule"></div>
+  <div class="bk-meta">{{담당자 이름과 직함}}<br>{{이메일}}<br>{{전화번호}}</div>
+</section>
+
+</main>
+</body></html>

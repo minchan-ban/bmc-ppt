@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>한끼랩 사업 소개 (샘플)</title>
+<!-- scripts/new_deck.py로 생성. 이 HTML이 덱의 원본이다. 내용 수정은 여기서 하고 scripts/build.py로 PPTX·PDF·Figma용 파일을 다시 만든다.
+     규칙: harness/headline-rules.md, harness/slide-rules.md / 검사: python3 scripts/check_deck.py deck.html -->
+<style>
+/*deck.css:start*/
+/* ============================================================
+   bmc-ppt 디자인 시스템 (16:9, 1280×720px, 1 section = 1 슬라이드)
+   - 색상과 글꼴은 아래 토큰에서만 바꾼다. 부품 CSS에 색상 값을 직접 쓰지 않는다.
+   - PPTX·Figma 변환 제약: transform, ::before/::after 장식, SVG, color-mix()를 쓰지 않는다.
+     (SVG는 이미지로 변환되어 편집할 수 없고, 나머지는 변환기가 재현하지 못한다)
+   - 1px = 0.75pt. 본문 15px는 PowerPoint에서 11.25pt가 된다.
+   ============================================================ */
+
+/* ── 공통 토큰 ── */
+:root{
+  --font:"Pretendard","Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  /* Pretendard 굵기 용도 (design/typography.md 참조) */
+  --w-body:400;      /* 본문, 표의 셀 */
+  --w-label:500;     /* 라벨, 키커, 축 단위, 출처 강조 */
+  --w-head:600;      /* 헤드메시지, 열 제목, 표 머리글, 본문 내 강조 */
+  --w-cover:700;     /* 표지 제목, 장 구분 제목 */
+  --w-num:800;       /* 핵심 수치 */
+
+  /* 브랜드 색: 기본값. 회사 색은 brand.json에 적으면 new_deck.py가 덱마다 덮어쓴다 */
+  --brand:#D9415F;       /* 기본 로즈 */
+  --brand-soft:#FBE9ED;
+
+  --neg:#8F1D14;     /* 악화·불가 등 의미를 가진 빨강. 테마가 바뀌어도 유지. 브랜드 로즈와 구분되도록 어두운 적갈색 */
+  --page-bg:#E9EBEE;
+  --slide-bg:#FFFFFF;
+}
+
+/* ── 팔레트 ──
+   덱마다 네 가지 가운데 하나를 고른다 (new_deck.py --palette). 기본은 rose다.
+   강조색은 모두 브랜드 색(--brand)이고, 글자색(--primary)과 짙은 면(--panel)에서 차이가 난다.
+   --panel: 표지의 띠, 장 구분, 주장 패널, 강조한 단계처럼 짙게 채우는 면의 색 */
+
+/* A. rose: 차콜 + 로즈 포인트 (기본). 가장 절제된 구성. 로즈는 강조 막대와 라벨에만 나온다 */
+:root,[data-theme="rose"]{
+  --ink:#232326;       /* 본문 */
+  --primary:#18181C;   /* 헤드메시지, 굵은 괘선 */
+  --panel:#18181C;     /* 짙은 면 */
+  --accent:var(--brand); /* 강조 막대, 축 라벨, 번호 */
+  --muted:#6B6B73;     /* 출처, 주석, 보조 라벨 */
+  --rule:#CFCFD4;      /* 행 사이 괘선 */
+  --hair:#E7E7EA;      /* 더 옅은 괘선 */
+  --soft:var(--brand-soft); /* 의미 있는 옅은 채움 */
+  --bar:#C9C9CF;       /* 비강조 막대 */
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#B9B9C0;
+}
+/* B. rose-panel: 차콜 글자 + 로즈 면. 표지의 띠와 패널이 로즈로 채워져 브랜드가 가장 강하게 드러난다 */
+[data-theme="rose-panel"]{
+  --ink:#232326;
+  --primary:#18181C;
+  --panel:var(--brand);
+  --accent:var(--brand);
+  --muted:#6B6B73;
+  --rule:#CFCFD4;
+  --hair:#E7E7EA;
+  --soft:var(--brand-soft);
+  --bar:#C9C9CF;
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#FBD3DB;
+}
+/* C. berry: 버건디 + 로즈. 헤드메시지까지 붉은 계열이고 비강조 막대도 연한 핑크다 */
+[data-theme="berry"]{
+  --ink:#2A1F24;
+  --primary:#6E1A33;
+  --panel:#6E1A33;
+  --accent:var(--brand);
+  --muted:#7A6A70;
+  --rule:#D9C9CE;
+  --hair:#EDE3E6;
+  --soft:var(--brand-soft);
+  --bar:#E3B7C2;
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#EBB9C6;
+}
+/* D. navy-rose: 네이비 + 로즈 포인트. 금융권처럼 보수적인 상대에게 보낼 때 */
+[data-theme="navy-rose"]{
+  --ink:#1B2230;
+  --primary:#0B2545;
+  --panel:#0B2545;
+  --accent:var(--brand);
+  --muted:#667085;
+  --rule:#C5CBD3;
+  --hair:#E3E7EC;
+  --soft:var(--brand-soft);
+  --bar:#B8C2D1;
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#A9BAD3;
+}
+
+/* ── 캔버스 ── */
+@page{size:1280px 720px;margin:0}
+html,body{margin:0;background:var(--page-bg);font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{display:block}
+.slide{width:1280px;height:720px;background:var(--slide-bg);position:relative;margin:24px auto;box-sizing:border-box;
+  padding:34px 56px 0 56px;overflow:hidden;page-break-after:always;display:flex;flex-direction:column;font-weight:var(--w-body);word-break:keep-all}
+.slide *{box-sizing:border-box}
+@media print{html,body{background:#fff}.slide{margin:0}}
+
+/* ── 머리 영역: 모든 본문 슬라이드에서 높이가 같다 ── */
+.top{display:flex;justify-content:space-between;align-items:center;height:16px;flex:0 0 auto}
+.top .brand{font-size:11px;font-weight:var(--w-head);color:var(--primary);letter-spacing:.02em}
+.top .kicker{font-size:11px;font-weight:var(--w-label);color:var(--muted)}
+/* 헤드메시지: 2줄까지. 영역 높이를 고정해서 본문 시작 위치를 전 슬라이드에서 맞춘다 */
+.title{margin:12px 0 0 0;height:74px;font-size:27px;line-height:36px;font-weight:var(--w-head);color:var(--primary);
+  letter-spacing:-.01em;flex:0 0 auto;word-break:keep-all}
+.hr{height:0;border-top:1.5px solid var(--primary);margin-top:8px;flex:0 0 auto}
+
+/* ── 본문 영역 ── */
+.body{margin-top:20px;margin-bottom:66px;flex:1;min-height:0;display:flex;flex-direction:column;gap:16px}
+.body.mid{justify-content:center}
+.src{position:absolute;left:56px;right:56px;bottom:42px;font-size:10.5px;line-height:14px;color:var(--muted)}
+.foot{position:absolute;left:56px;right:56px;bottom:14px;height:20px;border-top:1px solid var(--hair);padding-top:6px;
+  display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.foot .pg{font-weight:var(--w-label);color:var(--ink)}
+
+/* ── 공통 글자 ── */
+b,strong,.em{font-weight:var(--w-head);color:var(--primary)}
+.muted{color:var(--muted)}
+.acc{color:var(--accent)}
+.neg{color:var(--neg)}
+/* 축 제목: 도표 바로 위에 두는 "무엇의 데이터인지 + 단위·기간" 한 줄 */
+.axh{display:flex;justify-content:space-between;align-items:flex-end;height:30px;padding-bottom:7px;border-bottom:1.5px solid var(--primary);
+  font-size:16px;font-weight:var(--w-head);color:var(--primary);flex:0 0 auto}
+.axh .u{font-size:11.5px;font-weight:var(--w-body);color:var(--muted)}
+/* 열 제목: 2단 구성에서 각 단의 제목. 좌우 높이와 괘선 위치가 같다 */
+.colh{display:flex;align-items:flex-end;height:30px;padding-bottom:7px;border-bottom:1.5px solid var(--primary);
+  font-size:16px;font-weight:var(--w-head);color:var(--primary);flex:0 0 auto}
+
+/* ── 글머리표 ── */
+ul.bl{margin:0;padding:0 0 0 19px;font-size:16px;line-height:26px;color:var(--ink);list-style:disc}
+ul.bl>li{margin:0 0 10px 0;padding-left:2px}
+ul.bl>li:last-child{margin-bottom:0}
+ul.bl ul{margin:5px 0 0 0;padding:0 0 0 18px;list-style:"– ";font-size:15px;line-height:23px;color:var(--ink)}
+ul.bl ul>li{margin:0 0 3px 0}
+ul.bl.lg{font-size:18px;line-height:29px}
+ul.bl.sm{font-size:13.5px;line-height:21px}
+ul.bl.sm>li{margin-bottom:6px}
+
+/* ── 2단·3단 구성 ── */
+.cols{display:grid;grid-template-columns:1.45fr 1fr;gap:40px;flex:1;min-height:0}
+.cols.eq{grid-template-columns:1fr 1fr}
+.cols.w3{grid-template-columns:1fr 1fr 1fr;gap:32px}
+.cols.arrow{grid-template-columns:1.3fr 22px 1fr;gap:22px}
+.cols>div{display:flex;flex-direction:column;min-height:0}
+.cols>div>.fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:14px}
+.cols>div>.fill.up{justify-content:flex-start}
+/* 전제 → 귀결의 인과를 나타내는 삼각형 (좌우 사이에 하나만) */
+.tri{align-self:center;width:0;height:0;border-top:13px solid transparent;border-bottom:13px solid transparent;border-left:16px solid var(--bar)}
+
+/* ── 표: 채움 없이 괘선으로 축을 나타낸다 ── */
+table.t{border-collapse:collapse;width:100%;font-size:15px;line-height:23px;color:var(--ink)}
+table.t.eq{table-layout:fixed}
+table.t th{text-align:left;vertical-align:bottom;padding:0 10px 7px 10px;height:30px;font-size:16px;line-height:21px;font-weight:var(--w-head);
+  color:var(--primary);border-bottom:1.5px solid var(--primary);background:none}
+table.t td{padding:11px 10px;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t th:first-child,table.t td:first-child{padding-left:0}
+table.t td.ax{font-size:16px;font-weight:var(--w-head);color:var(--primary)}
+table.t td.num,table.t th.num{text-align:right}
+table.t td.ctr,table.t th.ctr{text-align:center}
+table.t td.big{font-size:22px;line-height:28px;font-weight:var(--w-num);color:var(--primary)}
+table.t td.na{color:var(--muted);background:var(--soft)}
+table.t tr.focus td{background:var(--soft)}
+table.t td ul{margin:0;padding:0 0 0 16px;list-style:disc}
+table.t td ul li{margin:0 0 2px 0}
+.body>table.t{flex:0 0 auto}
+table.t.tall td{padding-top:20px;padding-bottom:20px;font-size:16px;line-height:25px}
+table.t.tall td.ax{font-size:17px}
+table.t.dense td{padding-top:7px;padding-bottom:7px;font-size:13px;line-height:19px}
+
+/* ── 핵심 수치 ── */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:0;flex:0 0 auto}
+.kpis.k4{grid-template-columns:repeat(4,1fr)}
+.kpis.k2{grid-template-columns:repeat(2,1fr)}
+.kpi{padding:4px 24px 6px 24px;border-left:1px solid var(--rule);display:flex;flex-direction:column}
+.kpi:first-child{padding-left:0;border-left:0}
+.kpi .lb{font-size:14px;line-height:19px;font-weight:var(--w-label);color:var(--muted)}
+.kpi .v{font-size:52px;line-height:62px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.02em;margin-top:4px}
+.kpi .v .un{font-size:22px;font-weight:var(--w-head);letter-spacing:0;margin-left:2px}
+.kpi .v.acc{color:var(--accent)}
+.kpi .ds{font-size:14.5px;line-height:21px;color:var(--ink);margin-top:6px}
+
+/* ── 가로 막대 (항목 비교·순위) ── */
+.bars{display:flex;flex-direction:column;gap:0;flex:1;min-height:0;justify-content:center}
+.bars .row{display:grid;grid-template-columns:170px 1fr 84px;align-items:center;gap:14px;height:44px;border-bottom:1px solid var(--hair)}
+.bars .row:last-child{border-bottom:0}
+.bars .nm{font-size:15px;line-height:20px;color:var(--ink)}
+.bars .trk{height:22px;display:flex}
+.bars .bar{height:22px;background:var(--bar)}
+.bars .val{font-size:15px;font-weight:var(--w-head);color:var(--primary);text-align:right}
+.bars .row.on .bar{background:var(--accent)}
+.bars .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.bars .row.on .val{color:var(--accent)}
+.bars .row.fc .bar{background:transparent;border:1.5px dashed var(--bar)}  /* 추정치: 점선 막대 */
+.bars .row.fc .val{color:var(--muted)}
+
+/* ── 세로 막대 (시계열) ── */
+.colchart{display:flex;flex-direction:column;flex:1;min-height:0}
+.colchart .plot{flex:1;min-height:150px;display:flex;align-items:flex-end;gap:28px;padding:0 20px;border-bottom:1.5px solid var(--primary)}
+.colchart .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.colchart .cv{font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--primary);margin-bottom:5px}
+.colchart .cb{width:100%;max-width:92px;background:var(--bar)}
+.colchart .col.on .cb{background:var(--accent)}
+.colchart .col.on .cv{color:var(--accent)}
+.colchart .col.fc .cb{background:var(--soft);border:1px dashed var(--accent)}
+.colchart .xs{display:flex;gap:28px;padding:7px 20px 0 20px;flex:0 0 auto}
+.colchart .xs div{flex:1;text-align:center;font-size:12.5px;line-height:17px;color:var(--muted)}
+
+/* ── 누적 가로 막대 (구성비) ── */
+.stack{display:flex;height:40px;flex:0 0 auto}
+.stack .sg{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:var(--w-head);color:var(--on-primary);background:var(--bar)}
+.stack .sg.a{background:var(--primary)}
+.stack .sg.b{background:var(--accent)}
+.stack .sg.c{background:var(--bar);color:var(--primary)}
+.stack .sg.d{background:var(--soft);color:var(--primary)}
+.legend{display:flex;gap:20px;font-size:11.5px;line-height:16px;color:var(--ink);flex:0 0 auto}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;display:block;background:var(--bar)}
+.legend i.a{background:var(--primary)}.legend i.b{background:var(--accent)}.legend i.c{background:var(--bar)}.legend i.d{background:var(--soft)}
+
+/* ── 단계 화살표 ── */
+.chev{display:flex;gap:6px;flex:0 0 auto}
+.chev .cv{flex:1;height:60px;background:var(--soft);display:flex;align-items:center;padding:0 22px 0 34px;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%)}
+.chev .cv:first-child{padding-left:20px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%)}
+.chev .cv span{font-size:16px;font-weight:var(--w-head);color:var(--primary)}
+.chev .cv.on{background:var(--panel)}
+.chev .cv.on span{color:var(--on-primary)}
+.chevx{display:flex;gap:6px;flex:1;min-height:0}
+.chevx>div{flex:1;padding:16px 22px 4px 2px;border-right:1px solid var(--hair)}
+.chevx>div:last-child{border-right:0}
+.chevx .st{font-size:13px;line-height:18px;font-weight:var(--w-label);color:var(--accent);margin-bottom:8px}
+
+/* ── 계산 흐름 (바텀업 시장 규모 등) ── */
+.calc{display:flex;align-items:stretch;gap:0;flex:0 0 auto}
+.calc .cx{flex:1;border-top:1.5px solid var(--primary);padding:12px 14px 4px 0;display:flex;flex-direction:column}
+.calc .cx .lb{font-size:13px;line-height:18px;font-weight:var(--w-label);color:var(--muted)}
+.calc .cx .v{font-size:34px;line-height:44px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.01em}
+.calc .cx .ds{font-size:14px;line-height:20px;color:var(--ink);margin-top:3px}
+.calc .op{flex:0 0 40px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:var(--w-label);color:var(--muted)}
+.calc .cx.res{border-top-color:var(--accent)}
+.calc .cx.res .v{color:var(--accent)}
+
+/* ── 2×2 매트릭스 ── */
+.mx{display:grid;grid-template-columns:1fr;grid-template-rows:24px 1fr 26px;flex:1;min-height:0}
+.mx .ylab{display:flex;align-items:flex-start;justify-content:space-between;font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.mx .xlab{display:flex;align-items:flex-end;justify-content:space-between;font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.mx .plane{position:relative;border-left:1.5px solid var(--primary);border-bottom:1.5px solid var(--primary)}
+.mx .vline{position:absolute;left:50%;top:0;bottom:0;width:0;border-left:1px dashed var(--rule)}
+.mx .hline{position:absolute;top:50%;left:0;right:0;height:0;border-top:1px dashed var(--rule)}
+.mx .q{position:absolute;font-size:11.5px;color:var(--muted)}
+.mx .pt{position:absolute;display:flex;align-items:center;gap:7px}
+.mx .pt i{width:14px;height:14px;border-radius:50%;background:var(--bar);display:block;flex:0 0 auto}
+.mx .pt span{font-size:13px;color:var(--ink);white-space:nowrap}
+.mx .pt.on i{background:var(--accent);width:18px;height:18px}
+.mx .pt.on span{font-weight:var(--w-head);color:var(--primary)}
+
+/* ── 충족도 기호 (표 안에서 사용. 모두 편집 가능한 도형으로 변환된다) ── */
+.hb{display:inline-block;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--primary);vertical-align:-2px;position:relative}
+.hb.f{background:var(--primary)}
+.hb.h i{position:absolute;left:3px;top:3px;width:6px;height:6px;border-radius:50%;background:var(--primary);display:block}
+
+/* ── 짙은 주장 패널 + 근거 ── */
+.side{display:grid;grid-template-columns:300px 1fr;gap:36px;flex:1;min-height:0}
+.side .sp{background:var(--panel);padding:26px 26px;display:flex;flex-direction:column;justify-content:flex-end}
+.side .sp .sn{font-size:50px;line-height:60px;font-weight:var(--w-num);color:var(--on-primary);letter-spacing:-.02em}
+.side .sp .sl{font-size:14px;line-height:19px;font-weight:var(--w-label);color:var(--on-primary-sub);margin-bottom:auto}
+.side .sp .sm{font-size:17px;line-height:26px;font-weight:var(--w-head);color:var(--on-primary);margin-top:10px}
+.side .sb{display:flex;flex-direction:column;min-height:0}
+
+/* ── 제품 화면 자리 ── */
+.shot{flex:1;min-height:0;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;background:var(--soft)}
+.shot span{font-size:13px;color:var(--muted)}
+.shot img{max-width:100%;max-height:100%;display:block}
+
+/* ── 로고 ──
+   로고 파일은 scripts/logo.py로 만든 투명 PNG를 쓴다 (harness/logo-rules.md).
+   로고 모음: 칸의 크기를 고정하고 로고를 그 안에 맞춘다. 높이를 같게 맞추면 가로로 긴 로고가 커 보이므로 너비도 함께 제한한다 */
+.logos{display:grid;grid-template-columns:repeat(5,1fr);gap:0;flex:0 0 auto;border-top:1px solid var(--hair)}
+.logos.c4{grid-template-columns:repeat(4,1fr)}
+.logos.c6{grid-template-columns:repeat(6,1fr)}
+.logos .lg{height:104px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--hair)}
+.logos .lg img{max-height:38px;max-width:62%;display:block}
+.logos .lg span{font-size:12px;color:var(--muted)}
+/* 표의 칸, 열 제목, 표지에 넣는 로고 */
+img.lgi{height:22px;width:auto;display:block}
+td img.lgi{height:20px}
+.top .brand img{height:13px;width:auto;display:block}
+.cover .cv-brand img,.back .bk-brand img{height:30px;width:auto;display:block}
+.cover .cv-with{position:absolute;left:76px;bottom:104px;display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted)}
+.cover .cv-with img{height:26px;width:auto;display:block}
+
+/* ── 핵심 요약 ── */
+.exec{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.exec .ex{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule)}
+.exec .ex:last-child{border-bottom:0}
+.exec .ex .no{font-size:15px;line-height:24px;font-weight:var(--w-head);color:var(--accent)}
+.exec .ex .mn{font-size:17px;line-height:25px;font-weight:var(--w-head);color:var(--primary)}
+.exec .ex ul{margin:5px 0 0 0;padding:0 0 0 18px;list-style:disc;font-size:15px;line-height:23px;color:var(--ink)}
+
+/* ── 표지, 장 구분, 뒤표지 ── */
+.slide.cover,.slide.back{padding:0}
+.cover .cv-l{position:absolute;left:0;top:0;bottom:0;width:20px;background:var(--panel)}
+.cover .cv-brand{position:absolute;left:76px;top:56px;font-size:15px;font-weight:var(--w-head);color:var(--primary);letter-spacing:.02em}
+.cover .cv-title{position:absolute;left:76px;right:120px;top:238px;font-size:46px;line-height:60px;font-weight:var(--w-cover);color:var(--primary);letter-spacing:-.02em;word-break:keep-all}
+.cover .cv-rule{position:absolute;left:76px;top:392px;width:64px;height:4px;background:var(--accent)}
+.cover .cv-sub{position:absolute;left:76px;right:120px;top:416px;font-size:19px;line-height:28px;font-weight:var(--w-label);color:var(--ink)}
+.cover .cv-meta{position:absolute;left:76px;bottom:52px;font-size:12.5px;line-height:19px;color:var(--muted)}
+.slide.divider{background:var(--panel);padding:0}
+.divider .dv-no{position:absolute;left:76px;top:262px;font-size:15px;font-weight:var(--w-label);color:var(--on-primary-sub);letter-spacing:.08em}
+.divider .dv-title{position:absolute;left:76px;right:120px;top:292px;font-size:38px;line-height:50px;font-weight:var(--w-cover);color:var(--on-primary);letter-spacing:-.01em}
+.divider .dv-sub{position:absolute;left:76px;right:120px;top:368px;font-size:16px;line-height:24px;color:var(--on-primary-sub)}
+.back .bk-brand{position:absolute;left:76px;top:300px;font-size:34px;line-height:44px;font-weight:var(--w-cover);color:var(--primary)}
+.back .bk-rule{position:absolute;left:76px;top:360px;width:64px;height:4px;background:var(--accent)}
+.back .bk-meta{position:absolute;left:76px;top:384px;font-size:14px;line-height:23px;color:var(--ink)}
+.back .cv-l{position:absolute;left:0;top:0;bottom:0;width:20px;background:var(--panel)}
+
+/* ============================================================
+   컨설팅 도형 묶음 (p26~p47)
+   원본의 구조는 vendor/consulting-pptx-skill의 부품 62종과 vendor/mckinsey-pptx의 템플릿 40종을 참고했다.
+   모두 div 도형이라 PPTX에서 사각형·타원·다각형·선으로 변환된다. 수치에 맞춰 style의 비율(%)을 고친다.
+   ============================================================ */
+.tri.d{border:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:16px solid var(--bar)}
+.tri.u{border:0;border-left:13px solid transparent;border-right:13px solid transparent;border-bottom:16px solid var(--bar)}
+.tri.l{border:0;border-top:13px solid transparent;border-bottom:13px solid transparent;border-right:16px solid var(--bar)}
+.xs{display:flex;gap:22px;padding:7px 16px 0 16px;flex:0 0 auto}
+.xs div{flex:1;text-align:center;font-size:12.5px;line-height:17px;color:var(--muted)}
+
+/* ── 폭포 (증감 브리지): 막대의 bottom과 height를 %로 준다 ── */
+.wf{display:flex;flex-direction:column;flex:1;min-height:0}
+.wf .plot{flex:1;min-height:190px;display:flex;gap:22px;padding:0 16px;border-bottom:1.5px solid var(--primary)}
+.wf .col{flex:1;position:relative}
+.wf .wb{position:absolute;left:14%;right:14%;background:var(--bar)}
+.wf .wv{position:absolute;left:0;right:0;text-align:center;font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--primary)}
+.wf .col.tot .wb{background:var(--primary)}
+.wf .col.up .wb{background:var(--accent)}
+.wf .col.up .wv{color:var(--accent)}
+.wf .col.dn .wb{background:var(--bar)}
+
+/* ── 누적 세로 막대: 조각의 height를 %로 준다 ── */
+.stk{display:flex;flex-direction:column;flex:1;min-height:0}
+.stk .plot{flex:1;min-height:190px;display:flex;align-items:flex-end;gap:30px;padding:0 24px;border-bottom:1.5px solid var(--primary)}
+.stk .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.stk .tv{font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--primary);margin-bottom:5px}
+.stk .sg{width:100%;max-width:96px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:var(--w-head);color:var(--on-primary);background:var(--bar)}
+.stk .sg.a{background:var(--primary)}.stk .sg.b{background:var(--accent)}.stk .sg.c{background:var(--bar);color:var(--primary)}.stk .sg.d{background:var(--soft);color:var(--primary)}
+
+/* ── 묶음 세로 막대: 두 계열을 나란히 ── */
+.grp{display:flex;flex-direction:column;flex:1;min-height:0}
+.grp .plot{flex:1;min-height:190px;display:flex;align-items:flex-end;gap:34px;padding:0 24px;border-bottom:1.5px solid var(--primary)}
+.grp .g{flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:6px}
+.grp .b{width:42px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.grp .b span{white-space:nowrap;font-size:12.5px;line-height:18px;font-weight:var(--w-head);color:var(--primary);margin-bottom:4px}
+.grp .b i{display:block;width:100%;background:var(--bar)}
+.grp .b.on i{background:var(--accent)}
+.grp .b.on span{color:var(--accent)}
+
+/* ── 깔때기: 막대의 width를 %로 준다 ── */
+.fnl{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.fnl .row{display:grid;grid-template-columns:150px 1fr 120px;align-items:center;gap:16px;height:52px}
+.fnl .nm{font-size:15px;line-height:20px;font-weight:var(--w-head);color:var(--primary)}
+.fnl .trk{display:flex;justify-content:center}
+.fnl .fb{white-space:nowrap;height:36px;background:var(--bar);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:var(--w-head);color:var(--primary)}
+.fnl .row.on .fb{background:var(--accent);color:var(--on-primary)}
+.fnl .row.first .fb{background:var(--primary);color:var(--on-primary)}
+.fnl .rt{font-size:13px;line-height:18px;color:var(--muted)}
+.fnl .rt b{font-size:15px}
+
+/* ── 분산형·버블: 점의 left와 top을 %로 준다. 버블은 i의 width와 height도 함께 ── */
+.sc{display:grid;grid-template-columns:44px 1fr;grid-template-rows:1fr 30px;flex:1;min-height:0}
+.sc .yt{white-space:nowrap;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:8px;font-size:11.5px;color:var(--muted)}
+.sc .xt{grid-column:2;display:flex;justify-content:space-between;align-items:flex-end;font-size:11.5px;color:var(--muted)}
+.sc .plane{position:relative;border-left:1.5px solid var(--primary);border-bottom:1.5px solid var(--primary)}
+.sc .gl{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--hair)}
+.sc .pt{position:absolute;display:flex;align-items:center;gap:7px}
+.sc .pt i{width:12px;height:12px;border-radius:50%;background:var(--bar);display:block;flex:0 0 auto}
+.sc .pt span{font-size:12.5px;color:var(--ink);white-space:nowrap}
+.sc .pt.on i{background:var(--accent)}
+.sc .pt.on span{font-weight:var(--w-head);color:var(--primary)}
+.sc .ref{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--rule)}
+.sc .rl{position:absolute;font-size:11.5px;color:var(--muted)}
+
+/* ── 점 추이 (꺾은선 대신): 점의 bottom을 %로 준다 ── */
+.dots{display:flex;flex-direction:column;flex:1;min-height:0}
+.dots .plot{flex:1;min-height:190px;display:flex;gap:22px;padding:0 16px;border-bottom:1.5px solid var(--primary)}
+.dots .col{flex:1;position:relative;border-left:1px solid var(--hair)}
+.dots .col:first-child{border-left:0}
+.dots .d{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center}
+.dots .d span{font-size:13px;line-height:18px;font-weight:var(--w-head);color:var(--muted)}
+.dots .d i{width:12px;height:12px;border-radius:50%;background:var(--bar);display:block}
+.dots .d.on span{color:var(--accent)}
+.dots .d.on i{background:var(--accent)}
+
+/* ── 이슈 트리 ── */
+.tree{display:flex;align-items:stretch;flex:1;min-height:0}
+.tree .root{flex:0 0 210px;display:flex;align-items:center}
+.tree .rb{background:var(--panel);color:var(--on-primary);padding:16px 18px;font-size:16px;line-height:24px;font-weight:var(--w-head);width:100%}
+.tree .ln{flex:0 0 22px;height:0;border-top:1.5px solid var(--primary);align-self:center}
+.tree .brs{flex:1;display:flex;flex-direction:column;justify-content:center}
+.tree .br{display:flex;align-items:stretch}
+.tree .br>.in{flex:1;display:flex;align-items:stretch;padding:8px 0}
+.tree .vt{flex:0 0 0;border-left:1.5px solid var(--primary)}
+.tree .br:first-child .vt{align-self:flex-end;height:50%}
+.tree .br:last-child .vt{align-self:flex-start;height:50%}
+.tree .bb{flex:0 0 230px;background:var(--soft);padding:12px 16px;font-size:15px;line-height:22px;font-weight:var(--w-head);color:var(--primary);display:flex;align-items:center}
+.tree .lfs{flex:1;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--rule);padding:4px 0}
+.tree .lf{display:flex;align-items:center;padding:5px 0}
+.tree .lf .ln{border-top:1px solid var(--rule);flex:0 0 16px}
+.tree .lf span{font-size:14px;line-height:21px;color:var(--ink);padding-left:8px}
+.tree .lf b{padding-left:8px;font-size:14px;line-height:21px}
+
+/* ── 가치 사슬의 범위 띠 ── */
+.band{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;flex:0 0 auto}
+.band.c4{grid-template-columns:repeat(4,1fr)}
+.band .lb{grid-column:1/-1;font-size:12px;line-height:17px;font-weight:var(--w-label);color:var(--muted)}
+.band .bd{height:26px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:var(--w-head);background:var(--bar);color:var(--primary)}
+.band .bd.on{background:var(--accent);color:var(--on-primary)}
+.band .bd.no{background:none;border:1px dashed var(--rule);color:var(--muted);font-weight:var(--w-body)}
+
+/* ── 순환 사이클 ── */
+.cyc{display:grid;grid-template-columns:1fr 40px 1fr;grid-template-rows:1fr 40px 1fr;gap:10px;flex:1;min-height:0}
+.cyc .nd{background:var(--soft);padding:14px 18px;display:flex;flex-direction:column;justify-content:center}
+.cyc .nd .st{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--accent)}
+.cyc .nd .nt{font-size:16px;line-height:23px;font-weight:var(--w-head);color:var(--primary);margin-top:2px}
+.cyc .nd .nx{font-size:13.5px;line-height:20px;color:var(--ink);margin-top:4px}
+.cyc .nd.on{background:var(--panel)}
+.cyc .nd.on .st{color:var(--on-primary-sub)}
+.cyc .nd.on .nt,.cyc .nd.on .nx{color:var(--on-primary)}
+.cyc .ar{display:flex;align-items:center;justify-content:center}
+.cyc .mid{display:flex;align-items:center;justify-content:center}
+
+/* ── 기둥과 토대 ── */
+.plr{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.plr .roof{background:var(--panel);color:var(--on-primary);padding:11px 18px;font-size:16px;line-height:23px;font-weight:var(--w-head);text-align:center;flex:0 0 auto}
+.plr .ps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:1;min-height:0}
+.plr .ps.c4{grid-template-columns:repeat(4,1fr)}
+.plr .p{background:var(--soft);padding:16px 18px;display:flex;flex-direction:column}
+.plr .p .pn{font-size:13px;line-height:18px;font-weight:var(--w-label);color:var(--accent)}
+.plr .p .pt{font-size:16px;line-height:23px;font-weight:var(--w-head);color:var(--primary);margin:2px 0 10px 0}
+.plr .base{background:var(--bar);padding:10px 18px;font-size:14.5px;line-height:21px;color:var(--primary);flex:0 0 auto;display:flex;gap:14px}
+.plr .base b{flex:0 0 auto}
+
+/* ── 히트맵 표 ── */
+table.t td.h0{background:none;text-align:center;color:var(--muted)}
+table.t td.h1{background:var(--soft);text-align:center;color:var(--primary)}
+table.t td.h2{background:var(--bar);text-align:center;color:var(--primary);font-weight:var(--w-head)}
+table.t td.h3{background:var(--accent);text-align:center;color:var(--on-primary);font-weight:var(--w-head)}
+table.t.heat td{border-bottom:2px solid var(--slide-bg)}
+table.t.heat td.ax{border-bottom:1px solid var(--rule)}
+.legend i.h1{background:var(--soft)}.legend i.h2{background:var(--bar)}.legend i.h3{background:var(--accent)}
+
+/* ── 간트 차트 ── */
+table.t.gantt{table-layout:fixed;font-size:13px;line-height:18px}
+table.t.gantt th{font-size:13px;text-align:center;padding-left:2px;padding-right:2px;border-left:1px solid var(--hair)}
+table.t.gantt th:first-child{text-align:left;border-left:0}
+table.t.gantt td{padding:7px 8px;border-left:1px solid var(--hair);border-bottom:5px solid var(--slide-bg);border-top:5px solid var(--slide-bg);height:42px}
+table.t.gantt td:first-child{border-left:0;font-size:14.5px}
+table.t.gantt td.g{background:var(--bar);color:var(--primary);font-weight:var(--w-head)}
+table.t.gantt td.g.on{background:var(--accent);color:var(--on-primary)}
+table.t.gantt td.ms{text-align:center;color:var(--primary);font-weight:var(--w-head)}
+
+/* ── 조직도 ── */
+.oc{display:flex;flex-direction:column;align-items:stretch;flex:1;min-height:0;justify-content:center}
+.oc .topb{align-self:center;background:var(--panel);color:var(--on-primary);padding:12px 26px;text-align:center;min-width:240px}
+.oc .topb .on1{font-size:16px;line-height:22px;font-weight:var(--w-head)}
+.oc .topb .on2{font-size:12.5px;line-height:18px;color:var(--on-primary-sub)}
+.oc .stem{align-self:center;width:0;height:18px;border-left:1.5px solid var(--primary)}
+.oc .bar4{height:0;border-top:1.5px solid var(--primary);margin:0 calc((100% - 60px) / 8)}
+.oc .bar3{height:0;border-top:1.5px solid var(--primary);margin:0 calc((100% - 40px) / 6)}
+.oc .row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.oc .row.c3{grid-template-columns:repeat(3,1fr)}
+.oc .u{display:flex;flex-direction:column}
+.oc .u .stem{height:14px}
+.oc .ub{background:var(--soft);padding:10px 14px;text-align:center}
+.oc .ub .un1{font-size:15px;line-height:21px;font-weight:var(--w-head);color:var(--primary)}
+.oc .ub .un2{font-size:12.5px;line-height:18px;color:var(--muted)}
+.oc .u ul{margin-top:10px}
+
+/* ── 번호 붙인 실행 과제, 고객의 말 ── */
+table.t td.no{font-size:30px;line-height:36px;font-weight:var(--w-num);color:var(--accent);width:64px}
+.quote{display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;border-left:4px solid var(--accent);padding:6px 0 6px 28px}
+.quote .qt{font-size:24px;line-height:38px;font-weight:var(--w-label);color:var(--primary)}
+.quote .qa{display:flex;align-items:center;gap:14px;margin-top:22px;font-size:14px;line-height:21px;color:var(--ink)}
+.quote .qa b{font-size:15px}
+.quote .qa img{height:22px;width:auto;display:block}
+.cols.accent3>div:last-child .colh{border-bottom-color:var(--accent);color:var(--accent)}
+.stepno{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--accent);margin-bottom:4px}
+
+/* ── 화면 여러 장과 설명 (제품 화면을 번호로 짚어 설명할 때) ── */
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.shots.s3{grid-template-columns:1fr 1fr 1fr}
+.shots .sh{display:flex;flex-direction:column;align-items:center;min-height:0}
+.shots .sh .im{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start}
+.shots .sh img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
+.shots .cap{margin-top:10px;font-size:13.5px;line-height:19px;color:var(--ink);text-align:center}
+.shots .cap b{color:var(--accent)}
+
+/* ── 두 대상을 같은 행으로 비교 (행 이름 | 대상 A | 대상 B). 그림과 큰 수치를 칸에 넣을 수 있다 ── */
+.cmp{display:grid;grid-template-columns:200px 1fr 1fr;column-gap:30px;flex:1;min-height:0;align-content:center}
+.cmp>div{padding:10px 0;border-bottom:1px solid var(--rule);display:flex;align-items:center;font-size:15px;line-height:22px;color:var(--ink)}
+.cmp>.ax{font-weight:var(--w-head);color:var(--primary)}
+.cmp>.hd{border-bottom:1.5px solid var(--primary);padding:0 0 8px 0;font-size:18px;font-weight:var(--w-head);color:var(--primary)}
+.cmp>.hd img{height:28px;width:auto;display:block}
+.cmp>.pic img{height:170px;width:auto;display:block}
+.cmp>.st{flex-direction:column;align-items:flex-start;justify-content:center}
+.cmp .big{font-size:30px;line-height:38px;font-weight:var(--w-num);color:var(--primary)}
+.cmp .big.acc{color:var(--accent)}
+.cmp .sm{font-size:12.5px;line-height:17px;color:var(--muted)}
+.cmp>.end{border-bottom:0}
+
+/* ── 표지 변형: 큰 로고가 오른쪽 아래로 잘려 나가는 표지 (cover hero) ── */
+.cover.hero .cv-hero{position:absolute;right:-90px;bottom:-70px;height:620px;width:auto;display:block}
+.cover.hero .cv-title{top:230px;font-size:56px;line-height:68px;right:560px}
+.cover.hero .cv-rule{top:330px}
+.cover.hero .cv-sub{top:356px;font-size:20px;line-height:30px;right:560px}
+/*deck.css:end*/
+:root{--brand:#D9415F;--brand-soft:#FBE9ED;}
+</style></head><body>
+<main class="deck" data-theme="rose" data-type="investor">
+<!-- p01 표지 -->
+<section data-part="p01" data-type="cover" class="slide cover">
+  <div class="cv-l"></div>
+  <div class="cv-brand">Hankki Lab</div>
+  <div class="cv-title">직장인 점심 결정을<br>추천 한 번으로 단축</div>
+  <div class="cv-rule"></div>
+  <div class="cv-sub">직장인 점심 구독 서비스 한끼랩</div>
+  <div class="cv-meta">2026년 10월<br>샘플 덱 (가상 회사, 가상 수치)</div>
+</section>
+<!-- p09 핵심 수치와 읽는 법 -->
+<section data-part="p09" data-type="kpi_row_readout" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">문제</span></div>
+  <h1 class="title">직장인 1명이 점심 결정에 앱 3곳 비교,<br>하루 12분, 한 달 4시간 소요</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:30px">
+    <div class="kpis">
+      <div class="kpi"><div class="lb">하루 메뉴 결정 시간</div><div class="v">12<span class="un">분</span></div><div class="ds">직장인 1명이 메뉴 고민부터 주문까지 쓰는 시간</div></div>
+      <div class="kpi"><div class="lb">비교하는 배달 앱 수</div><div class="v">3<span class="un">곳</span></div><div class="ds">같은 메뉴의 가격과 배달비를 비교한 앱</div></div>
+      <div class="kpi"><div class="lb">한 달 누적 결정 시간</div><div class="v">4<span class="un">시간</span></div><div class="ds">근무일 20일 기준</div></div>
+    </div>
+    <div>
+      <div class="colh">결정이 길어지는 이유</div>
+      <ul class="bl" style="margin-top:14px">
+        <li>메뉴, 가격, 배달비가 앱마다 달라 같은 메뉴를 여러 번 비교</li>
+        <li>동료와 메뉴를 맞추는 과정이 메신저에서 따로 진행되어 주문 지연</li>
+        <li>식당은 주문이 몰리는 시간을 미리 알 수 없어 재료 손실 발생</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">출처: 가상 회사 샘플 (모든 수치는 예시)</div>
+  <div class="foot"><span>Hankki Lab | 한끼랩 사업 소개</span><span class="pg">1</span></div>
+</section>
+<!-- p10 단계 화살표 -->
+<section data-part="p10" data-type="chevron_steps" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">문제</span></div>
+  <h1 class="title">메뉴 결정과 배달 대기가<br>점심시간 60분 중 35분 차지</h1>
+  <div class="hr"></div>
+  <div class="body mid" style="gap:0">
+    <div class="chev">
+      <div class="cv"><span>메뉴 고민</span></div>
+      <div class="cv on"><span>앱 비교</span></div>
+      <div class="cv on"><span>동료와 조율</span></div>
+      <div class="cv on"><span>주문과 대기</span></div>
+    </div>
+    <div class="chevx" style="flex:0 0 auto">
+      <div><div class="st">점심 직전</div><ul class="bl"><li>업무 중에 메뉴 고민 시작</li><li>전날 먹은 메뉴를 피하려고 기록을 확인</li><li>정할 기준이 없어 결정이 늦어짐</li></ul></div>
+      <div><div class="st">배달 앱 3곳</div><ul class="bl"><li>같은 메뉴의 가격과 배달비를 비교</li><li>앱마다 할인 조건이 달라 계산 필요</li><li>결정에 하루 평균 12분 사용</li></ul></div>
+      <div><div class="st">메신저</div><ul class="bl"><li>동료 의견을 모아 메뉴를 통일</li><li>한 명이라도 답이 늦으면 주문 지연</li><li>최소 주문 금액을 맞추는 계산 반복</li></ul></div>
+      <div><div class="st">정오 이후</div><ul class="bl"><li>점심 시간대에 주문 집중</li><li>배달 대기 시간 평균 23분</li><li>결정 12분과 대기 23분, 점심시간 60분 중 35분 사용</li></ul></div>
+    </div>
+  </div>
+  <div class="src">출처: 가상 회사 샘플 (모든 수치는 예시)</div>
+  <div class="foot"><span>Hankki Lab | 한끼랩 사업 소개</span><span class="pg">2</span></div>
+</section>
+<!-- p11 과제와 해결의 2열 -->
+<section data-part="p11" data-type="problem_solution" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">해결</span></div>
+  <h1 class="title">팀 단위 메뉴 추천과 전날 사전 주문으로<br>점심 결정 시간을 12분에서 1분으로 단축</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t tall">
+      <tr><th style="width:170px">점심 단계</th><th>과제</th><th>해결</th></tr>
+      <tr><td class="ax">메뉴 결정</td><td>정할 기준이 없어 매일 12분씩 고민</td><td>최근 2주 식사 기록과 취향으로 메뉴 3개를 추천</td></tr>
+      <tr><td class="ax">동료와 조율</td><td>메신저에서 의견을 따로 모아 주문 지연</td><td>팀원이 추천 메뉴에 투표하면 한 번에 주문</td></tr>
+      <tr><td class="ax">주문과 대기</td><td>점심 시간대에 주문이 몰려 평균 23분 대기</td><td>전날 밤 사전 주문을 받아 정오에 맞춰 도착, 결정 시간 1분</td></tr>
+    </table>
+  </div>
+  <div class="src">출처: 가상 회사 샘플 (모든 수치는 예시)</div>
+  <div class="foot"><span>Hankki Lab | 한끼랩 사업 소개</span><span class="pg">3</span></div>
+</section>
+<!-- p15 주장 패널과 근거 -->
+<section data-part="p15" data-type="claim_panel_evidence" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">성과</span></div>
+  <h1 class="title">출시 6개월 만에 기업 고객 42곳 확보,<br>월 구독 이용자 3,150명</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="side">
+      <div class="sp"><div class="sl">기업 고객</div><div class="sn">42곳</div><div class="sm">출시 6개월 동안 기존 고객의 소개로 확보</div></div>
+      <div class="sb">
+        <div class="colh">구독 지표</div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:6px">
+          <table class="t tall">
+            <tr><td class="ax" style="width:160px">초기 확산</td><td>시범 운영 4주 만에 기업 8곳 계약</td></tr>
+            <tr><td class="ax">구독 이용자</td><td>월 구독 이용자 3,150명</td></tr>
+            <tr><td class="ax">재구독률</td><td>3개월 연속 구독한 이용자 비율 81%</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 가상 회사 샘플 (모든 수치는 예시)</div>
+  <div class="foot"><span>Hankki Lab | 한끼랩 사업 소개</span><span class="pg">4</span></div>
+</section>
+<!-- p24 뒤표지 -->
+<section data-part="p24" data-type="back_cover" class="slide back">
+  <div class="cv-l"></div>
+  <div class="bk-brand">Hankki Lab</div>
+  <div class="bk-rule"></div>
+  <div class="bk-meta">김한끼 대표<br>hello@example.com<br>example.com</div>
+</section>
+</main>
+</body></html>

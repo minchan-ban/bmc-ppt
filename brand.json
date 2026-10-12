@@ -1,0 +1,10 @@
+{
+  "company": "Your Company",
+  "brand": "#D9415F",
+  "brand_soft": "#FBE9ED",
+  "contact": {
+    "담당자 이름과 직함": "홍길동 대표",
+    "이메일": "hello@example.com",
+    "전화번호": "example.com"
+  }
+}

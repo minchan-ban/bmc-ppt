@@ -1,0 +1,10 @@
+.venv/
+tmp/
+__pycache__/
+*.pyc
+.DS_Store
+.omc/
+decks/*/out/
+decks/*/copy/_*.txt
+_workspace/
+assets/logos/_candidates/
