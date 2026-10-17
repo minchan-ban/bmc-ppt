@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="utf-8">
-<title>도표 부품 시연</title>
+<title>도표 부품 견본</title>
 <!-- scripts/new_deck.py로 생성. 이 HTML이 덱의 원본이다. 내용 수정은 여기서 하고 scripts/build.py로 PPTX·PDF·Figma용 파일을 다시 만든다.
      규칙: harness/headline-rules.md, harness/slide-rules.md / 검사: python3 scripts/check_deck.py deck.html -->
 <style>
@@ -679,10 +679,403 @@ table.t.cohort td{height:46px}
 <section data-part="p01" data-type="cover" class="slide cover">
   <div class="cv-l"></div>
   <div class="cv-brand">Hankki Lab</div>
-  <div class="cv-title">도표 부품 시연</div>
+  <div class="cv-title">도표 부품 견본</div>
   <div class="cv-rule"></div>
-  <div class="cv-sub">새로 더한 도표 14종을 예시 데이터로 채운 견본</div>
+  <div class="cv-sub">도표 부품 26종을 예시 데이터로 채운 견본</div>
   <div class="cv-meta">2026년 10월<br>내부 검토용, 수치는 모두 가상</div>
+</section>
+<!-- p06 가로 막대와 시사점 -->
+<section data-part="p06" data-type="ranked_bar_insight" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">가로 막대 p06</span></div>
+  <h1 class="title">브랜드사의 72%가 꼽은 도입 이유는<br>콘텐츠 제작 시간 단축</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>도입 이유 (복수 응답)</span><span class="u">%, 2026년 9월 고객 설문 (n=214)</span></div>
+        <div class="bars">
+          <div class="row on"><div class="nm">콘텐츠 제작 시간 단축</div><div class="trk"><div class="bar" style="width:92%"></div></div><div class="val">72%</div></div>
+          <div class="row"><div class="nm">구매 전환 증가</div><div class="trk"><div class="bar" style="width:61%"></div></div><div class="val">48%</div></div>
+          <div class="row"><div class="nm">마케팅 비용 절감</div><div class="trk"><div class="bar" style="width:45%"></div></div><div class="val">35%</div></div>
+          <div class="row"><div class="nm">인플루언서 관리 부담</div><div class="trk"><div class="bar" style="width:28%"></div></div><div class="val">22%</div></div>
+          <div class="row"><div class="nm">기타</div><div class="trk"><div class="bar" style="width:15%"></div></div><div class="val">12%</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>시간 단축이 2위인 구매 전환 증가보다 24%p 높다</li>
+            <li>비용 절감은 35%로 세 번째다</li>
+            <li>기타 응답은 12%에 그친다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">1</span></div>
+</section>
+<!-- p07 세로 막대 추이와 시사점 -->
+<section data-part="p07" data-type="column_trend_insight" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">세로 막대 추이 p07</span></div>
+  <h1 class="title">월 활성 브랜드사는 5개월 동안<br>98곳에서 214곳으로 증가</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>월 활성 브랜드사</span><span class="u">곳, 2026년 5~9월</span></div>
+        <div class="colchart">
+          <div class="plot">
+            <div class="col"><div class="cv">98</div><div class="cb" style="height:39%"></div></div>
+            <div class="col"><div class="cv">121</div><div class="cb" style="height:49%"></div></div>
+            <div class="col"><div class="cv">152</div><div class="cb" style="height:61%"></div></div>
+            <div class="col"><div class="cv">183</div><div class="cb" style="height:74%"></div></div>
+            <div class="col on"><div class="cv">214</div><div class="cb" style="height:86%"></div></div>
+          </div>
+          <div class="xs"><div>5월</div><div>6월</div><div>7월</div><div>8월</div><div>9월</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>5개월 만에 2.2배가 되었다</li>
+            <li>매달 23~31곳씩 늘었다</li>
+            <li>9월 증가 폭 31곳이 가장 크다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">2</span></div>
+</section>
+<!-- p08 구성비 누적 막대와 표 -->
+<section data-part="p08" data-type="composition_stack" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">구성비 누적 막대 p08</span></div>
+  <h1 class="title">매출의 48%는 중소 브랜드사에서 발생</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <div class="axh"><span>고객 규모별 매출 비중</span><span class="u">%, 2026년 1~9월</span></div>
+    <div class="stack">
+      <div class="sg a" style="width:48%">48%</div>
+      <div class="sg b" style="width:27%">27%</div>
+      <div class="sg c" style="width:16%">16%</div>
+      <div class="sg d" style="width:9%">9%</div>
+    </div>
+    <div class="legend"><span><i class="a"></i>중소 브랜드</span><span><i class="b"></i>중견 브랜드</span><span><i class="c"></i>대기업</span><span><i class="d"></i>1인 브랜드</span></div>
+    <table class="t">
+      <tr><th style="width:190px">고객 규모</th><th style="width:120px" class="num">매출</th><th>특징</th></tr>
+      <tr><td class="ax">중소 브랜드</td><td class="num">20.2억</td><td>캠페인을 자주, 작게 집행한다</td></tr>
+      <tr><td class="ax">중견 브랜드</td><td class="num">11.3억</td><td>분기마다 큰 캠페인을 한 번씩 연다</td></tr>
+      <tr><td class="ax">대기업</td><td class="num">6.7억</td><td>계약 기간이 길고 해지가 적다</td></tr>
+    </table>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">3</span></div>
+</section>
+<!-- p13 2×2 포지셔닝 -->
+<section data-part="p13" data-type="matrix_2x2" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">2×2 포지셔닝 p13</span></div>
+  <h1 class="title">콘텐츠 1건을 3일 안에 만들면서<br>실사용 후기를 쓰는 방식은 자사뿐</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="mx">
+          <div class="ylab"><span>콘텐츠 신뢰도 높음</span></div>
+          <div class="plane">
+            <div class="vline"></div><div class="hline"></div>
+            <div class="pt on" style="left:72%;top:18%"><i></i><span>자사</span></div>
+            <div class="pt" style="left:24%;top:26%"><i></i><span>인플루언서 대행사</span></div>
+            <div class="pt" style="left:64%;top:70%"><i></i><span>AI 생성 도구</span></div>
+            <div class="pt" style="left:18%;top:76%"><i></i><span>자체 촬영</span></div>
+          </div>
+          <div class="xlab"><span>낮음</span><span>제작 속도</span><span>높음</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">읽는 법</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>오른쪽 위가 빠르면서 믿을 만한 자리다</li>
+            <li>자사는 1건에 3일, 대행사는 3주가 걸린다</li>
+            <li>AI 도구는 빠르지만 실제 사용 후기와 다르다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">4</span></div>
+</section>
+<!-- p26 폭포 (증감 브리지) -->
+<section data-part="p26" data-type="waterfall" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">폭포 p26</span></div>
+  <h1 class="title">연 매출은 48억 원에서 81억 원으로 증가,<br>신규 브랜드가 18억 원 기여</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>연 매출 증감 요인</span><span class="u">억 원, 2025년 대비 2026년 전망</span></div>
+        <div class="wf">
+          <div class="plot">
+            <div class="col tot"><div class="wv" style="bottom:calc(51.0% + 5px)">48</div><div class="wb" style="bottom:0;height:51.0%"></div></div>
+            <div class="col up"><div class="wv" style="bottom:calc(70.1% + 5px)">+18</div><div class="wb" style="bottom:51.0%;height:19.1%"></div></div>
+            <div class="col up"><div class="wv" style="bottom:calc(79.6% + 5px)">+9</div><div class="wb" style="bottom:70.1%;height:9.6%"></div></div>
+            <div class="col dn"><div class="wv" style="bottom:calc(79.6% + 5px)">−6</div><div class="wb" style="bottom:73.3%;height:6.4%"></div></div>
+            <div class="col up"><div class="wv" style="bottom:calc(86.0% + 5px)">+12</div><div class="wb" style="bottom:73.3%;height:12.7%"></div></div>
+            <div class="col tot"><div class="wv" style="bottom:calc(86.0% + 5px)">81</div><div class="wb" style="bottom:0;height:86.0%"></div></div>
+          </div>
+          <div class="xs"><div>2025</div><div>신규 브랜드</div><div>객단가</div><div>이탈</div><div>신상품</div><div>2026E</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>신규 브랜드 18억 원이 증가분의 가장 큰 몫이다</li>
+            <li>이탈로 6억 원이 빠진다</li>
+            <li>신상품 데이터 리포트가 12억 원을 더한다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">5</span></div>
+</section>
+<!-- p27 누적 세로 막대 -->
+<section data-part="p27" data-type="stacked_column" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">누적 세로 막대 p27</span></div>
+  <h1 class="title">분기 매출은 11억 원에서 26억 원으로 증가,<br>구독이 3배로 가장 빠르게 성장</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>상품별 분기 매출</span><span class="u">억 원, 2025년 4분기~2026년 3분기</span></div>
+        <div class="stk">
+          <div class="plot">
+            <div class="col"><div class="tv">11</div><div class="sg c" style="height:6.5%">2</div><div class="sg b" style="height:9.7%">3</div><div class="sg a" style="height:19.4%">6</div></div>
+            <div class="col"><div class="tv">16</div><div class="sg c" style="height:9.7%">3</div><div class="sg b" style="height:16.2%">5</div><div class="sg a" style="height:25.8%">8</div></div>
+            <div class="col"><div class="tv">21</div><div class="sg c" style="height:12.9%">4</div><div class="sg b" style="height:22.6%">7</div><div class="sg a" style="height:32.3%">10</div></div>
+            <div class="col"><div class="tv">26</div><div class="sg c" style="height:16.2%">5</div><div class="sg b" style="height:29.1%">9</div><div class="sg a" style="height:38.8%">12</div></div>
+          </div>
+          <div class="xs" style="gap:30px;padding-left:24px;padding-right:24px"><div>25.4Q</div><div>26.1Q</div><div>26.2Q</div><div>26.3Q</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="a"></i>광고 상품</span><span><i class="b"></i>구독</span><span><i class="c"></i>데이터 리포트</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>구독은 3억 원에서 9억 원으로 3배가 되었다</li>
+            <li>광고 상품은 여전히 가장 크다</li>
+            <li>데이터 리포트는 5억 원까지 늘었다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">6</span></div>
+</section>
+<!-- p28 묶음 세로 막대 -->
+<section data-part="p28" data-type="grouped_column" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">묶음 세로 막대 p28</span></div>
+  <h1 class="title">도입 뒤 스킨케어 브랜드의 월 콘텐츠는<br>18건에서 52건으로 증가</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>브랜드사 1곳의 월 콘텐츠 수</span><span class="u">건, 도입 전 3개월과 도입 뒤 3개월 평균</span></div>
+        <div class="grp">
+          <div class="plot">
+            <div class="g"><div class="b"><span>18</span><i style="height:27%"></i></div><div class="b on"><span>52</span><i style="height:78%"></i></div></div>
+            <div class="g"><div class="b"><span>14</span><i style="height:21%"></i></div><div class="b on"><span>40</span><i style="height:60%"></i></div></div>
+            <div class="g"><div class="b"><span>9</span><i style="height:14%"></i></div><div class="b on"><span>22</span><i style="height:33%"></i></div></div>
+            <div class="g"><div class="b"><span>6</span><i style="height:9%"></i></div><div class="b on"><span>15</span><i style="height:22%"></i></div></div>
+          </div>
+          <div class="xs" style="gap:34px;padding-left:24px;padding-right:24px"><div>스킨케어</div><div>색조</div><div>헤어</div><div>바디</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="c"></i>도입 전</span><span><i class="b"></i>도입 후</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>네 카테고리 모두 2.4배 이상 늘었다</li>
+            <li>스킨케어는 34건이 늘어 증가 폭이 가장 크다</li>
+            <li>바디는 15건으로 아직 적다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">7</span></div>
+</section>
+<!-- p29 깔때기 -->
+<section data-part="p29" data-type="funnel" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">깔때기 p29</span></div>
+  <h1 class="title">상품을 본 고객의 46%만 장바구니에 담아,<br>장바구니 단계에서 가장 큰 이탈</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>캠페인 상품의 구매 흐름</span><span class="u">명, 2026년 9월 캠페인 12건 합계</span></div>
+        <div class="fnl">
+          <div class="row first"><div class="nm">방문</div><div class="trk"><div class="fb" style="width:100%">10,000</div></div><div class="rt">기준</div></div>
+          <div class="row"><div class="nm">상품 조회</div><div class="trk"><div class="fb" style="width:68%">6,800</div></div><div class="rt">앞 단계의 <b>68%</b></div></div>
+          <div class="row on"><div class="nm">장바구니</div><div class="trk"><div class="fb" style="width:31%">3,100</div></div><div class="rt">앞 단계의 <b>46%</b></div></div>
+          <div class="row"><div class="nm">결제 시작</div><div class="trk"><div class="fb" style="width:19%">1,900</div></div><div class="rt">앞 단계의 <b>61%</b></div></div>
+          <div class="row"><div class="nm">구매</div><div class="trk"><div class="fb" style="width:12%">1,200</div></div><div class="rt">앞 단계의 <b>63%</b></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>방문 1만 명 가운데 1,200명이 샀다</li>
+            <li>장바구니 단계의 전환율 46%가 가장 낮다</li>
+            <li>결제를 시작한 뒤에는 63%가 구매를 마친다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">8</span></div>
+</section>
+<!-- p30 분산형 -->
+<section data-part="p30" data-type="scatter" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">분산형 p30</span></div>
+  <h1 class="title">콘텐츠 1건에 22만 원을 쓰고 구매 전환율 5.2%,<br>비용이 비슷한 대안보다 높은 전환</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>구매 전환율 (세로), 콘텐츠 1건당 비용 (가로)</span><span class="u">%와 만 원, 2026년 3분기</span></div>
+        <div class="sc" style="margin-top:10px">
+          <div class="yt"><span>6%</span><span>3%</span><span>0</span></div>
+          <div class="plane">
+            <div class="gl" style="top:0"></div><div class="gl" style="top:50%"></div>
+            <div class="pt" style="left:12%;top:74%"><i></i><span>체험단</span></div>
+            <div class="pt" style="left:26%;top:60%"><i></i><span>블로그 대행</span></div>
+            <div class="pt" style="left:38%;top:52%"><i></i><span>소형 인플루언서</span></div>
+            <div class="pt" style="left:52%;top:38%"><i></i><span>중형 인플루언서</span></div>
+            <div class="pt" style="left:63%;top:30%"><i></i><span>대형 인플루언서</span></div>
+            <div class="pt on" style="left:44%;top:14%"><i></i><span>자사</span></div>
+          </div>
+          <div class="xt"><span>0</span><span>25만</span><span>50만</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>자사는 1건에 22만 원, 전환율 5.2%다</li>
+            <li>비용이 비슷한 소형 인플루언서는 2.9%다</li>
+            <li>대형 인플루언서는 31만 원을 써도 4.2%다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">9</span></div>
+</section>
+<!-- p31 버블 -->
+<section data-part="p31" data-type="bubble" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">버블 p31</span></div>
+  <h1 class="title">가장 크고 빠르게 크는 스킨케어 시장에서<br>점유율 31% 확보</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>시장 성장률 (세로), 자사 점유율 (가로), 원의 크기는 시장 규모</span><span class="u">%, 2026년</span></div>
+        <div class="sc" style="margin-top:10px">
+          <div class="yt"><span>32%</span><span>16%</span><span>0</span></div>
+          <div class="plane">
+            <div class="gl" style="top:0"></div><div class="gl" style="top:50%"></div>
+            <div class="ref" style="left:50%"></div>
+            <div class="pt" style="left:10%;top:62%"><i style="width:52px;height:52px"></i><span>색조</span></div>
+            <div class="pt" style="left:34%;top:44%"><i style="width:40px;height:40px"></i><span>헤어</span></div>
+            <div class="pt" style="left:58%;top:56%"><i style="width:30px;height:30px"></i><span>바디</span></div>
+            <div class="pt on" style="left:62%;top:12%"><i style="width:64px;height:64px"></i><span>스킨케어</span></div>
+          </div>
+          <div class="xt"><span>0</span><span>25%</span><span>50%</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>스킨케어 시장은 연 28% 성장하고 자사 점유율은 31%다</li>
+            <li>색조는 시장이 크지만 점유율이 5%뿐이다</li>
+            <li>바디는 점유율 29%지만 시장 성장률이 14%다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">10</span></div>
+</section>
+<!-- p32 점 추이 (꺾은선 대신) -->
+<section data-part="p32" data-type="dot_trend" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">점 추이 p32</span></div>
+  <h1 class="title">브랜드사 재구매율은 5분기 동안 52%에서 71%로 상승,<br>업계 평균은 45%</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>90일 재구매율</span><span class="u">%, 2025년 3분기~2026년 3분기 (세로축 0~100%)</span></div>
+        <div class="dots">
+          <div class="plot">
+            <div class="col"><div class="d on" style="bottom:52%"><span>52%</span><i></i></div><div class="d" style="bottom:40%"><span>40%</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:58%"><span>58%</span><i></i></div><div class="d" style="bottom:41%"><span>41%</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:63%"><span>63%</span><i></i></div><div class="d" style="bottom:43%"><span>43%</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:68%"><span>68%</span><i></i></div><div class="d" style="bottom:44%"><span>44%</span><i></i></div></div>
+            <div class="col"><div class="d on" style="bottom:71%"><span>71%</span><i></i></div><div class="d" style="bottom:45%"><span>45%</span><i></i></div></div>
+          </div>
+          <div class="xs"><div>25.3Q</div><div>25.4Q</div><div>26.1Q</div><div>26.2Q</div><div>26.3Q</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="b"></i>자사</span><span><i class="c"></i>업계 평균</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>자사는 분기마다 3~6%p씩 올랐다</li>
+            <li>업계 평균은 40%에서 45%로 5%p 올랐다</li>
+            <li>격차는 12%p에서 26%p로 벌어졌다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">11</span></div>
+</section>
+<!-- p37 히트맵 표 -->
+<section data-part="p37" data-type="heatmap_table" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">히트맵 표 p37</span></div>
+  <h1 class="title">중소 브랜드는 콘텐츠 제작과 성과 분석을 주 4회 사용,<br>대기업은 광고 집행에 집중</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <table class="t eq heat">
+      <tr><th style="width:200px">고객 규모</th><th class="ctr">콘텐츠 제작</th><th class="ctr">리뷰 관리</th><th class="ctr">광고 집행</th><th class="ctr">성과 분석</th><th class="ctr">정산</th></tr>
+      <tr><td class="ax">중소 브랜드</td><td class="h3">주 4회</td><td class="h2">주 2회</td><td class="h1">월 2회</td><td class="h3">주 4회</td><td class="h0">안 씀</td></tr>
+      <tr><td class="ax">중견 브랜드</td><td class="h2">주 2회</td><td class="h3">주 4회</td><td class="h2">주 2회</td><td class="h1">월 2회</td><td class="h1">월 2회</td></tr>
+      <tr><td class="ax">대기업</td><td class="h1">월 2회</td><td class="h1">월 2회</td><td class="h3">주 4회</td><td class="h2">주 2회</td><td class="h0">안 씀</td></tr>
+      <tr><td class="ax">1인 브랜드</td><td class="h0">안 씀</td><td class="h2">주 2회</td><td class="h1">월 2회</td><td class="h3">주 4회</td><td class="h2">주 2회</td></tr>
+    </table>
+    <div class="legend"><span><i class="h3"></i>주 3회 이상</span><span><i class="h2"></i>주 1~2회</span><span><i class="h1"></i>월 1~3회</span></div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">12</span></div>
 </section>
 <!-- p48 도트 매트릭스 -->
 <section data-part="p48" data-type="dot_matrix" class="slide">
@@ -712,7 +1105,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">1</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">13</span></div>
 </section>
 <!-- p49 시장 규모 원 (비례 원) -->
 <section data-part="p49" data-type="market_circles" class="slide">
@@ -746,7 +1139,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님. 원의 크기는 축척이 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">2</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">14</span></div>
 </section>
 <!-- p50 성장률 표시 세로 막대 -->
 <section data-part="p50" data-type="cagr_column" class="slide">
@@ -787,7 +1180,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">3</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">15</span></div>
 </section>
 <!-- p51 소형 도표 나열 -->
 <section data-part="p51" data-type="small_multiples" class="slide">
@@ -839,7 +1232,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">4</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">16</span></div>
 </section>
 <!-- p52 KPI 대시보드 -->
 <section data-part="p52" data-type="kpi_dashboard" class="slide">
@@ -857,7 +1250,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">5</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">17</span></div>
 </section>
 <!-- p53 메코 차트 -->
 <section data-part="p53" data-type="marimekko" class="slide">
@@ -889,7 +1282,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">6</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">18</span></div>
 </section>
 <!-- p54 전후 비교 덤벨 -->
 <section data-part="p54" data-type="dumbbell" class="slide">
@@ -923,7 +1316,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">7</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">19</span></div>
 </section>
 <!-- p55 증감 가로 막대 -->
 <section data-part="p55" data-type="diverging_bar" class="slide">
@@ -957,7 +1350,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">8</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">20</span></div>
 </section>
 <!-- p56 목표 대비 달성 -->
 <section data-part="p56" data-type="target_bullet" class="slide">
@@ -991,7 +1384,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">9</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">21</span></div>
 </section>
 <!-- p57 코호트 리텐션 표 -->
 <section data-part="p57" data-type="cohort_table" class="slide">
@@ -1026,7 +1419,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">10</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">22</span></div>
 </section>
 <!-- p58 도넛 (기본 차트) -->
 <section data-part="p58" data-type="doughnut" class="slide">
@@ -1052,7 +1445,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">11</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">23</span></div>
 </section>
 <!-- p59 원형 (기본 차트) -->
 <section data-part="p59" data-type="pie" class="slide">
@@ -1078,7 +1471,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">12</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">24</span></div>
 </section>
 <!-- p60 꺾은선 (기본 차트) -->
 <section data-part="p60" data-type="line" class="slide">
@@ -1104,7 +1497,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">13</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">25</span></div>
 </section>
 <!-- p61 누적 영역 (기본 차트) -->
 <section data-part="p61" data-type="area" class="slide">
@@ -1130,7 +1523,7 @@ table.t.cohort td{height:46px}
     </div>
   </div>
   <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
-  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">14</span></div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 견본</span><span class="pg">26</span></div>
 </section>
 <!-- p24 뒤표지 -->
 <section data-part="p24" data-type="back_cover" class="slide back">
