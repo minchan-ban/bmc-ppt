@@ -49,7 +49,7 @@ bash scripts/setup.sh           # .venv, python-pptx, Pretendard 글꼴 설치, 
 claude        # 이 폴더에서 Claude Code 실행
 ```
 Claude Code에서 `/bmc-ppt` 또는 "투자자용 IR 덱 만들어줘"라고 요청한다. 단계마다 확인을 받으며 진행한다.
-결과 예시는 `decks/_sample/`(가상 회사 '한끼랩'의 샘플 덱)에 있다. `.venv/bin/python scripts/build.py decks/_sample/deck.html --preview`로 직접 빌드해 볼 수 있다.
+결과 예시는 `decks/_sample/`(가상 회사 '한끼랩'의 샘플 덱)에 있다. 도표 부품 14종(p48~p61, 원형·도넛·꺾은선·영역은 PowerPoint 기본 차트)을 예시 데이터로 채운 견본은 `decks/_chart-sample/`에 PDF, PPTX와 함께 있다. `.venv/bin/python scripts/build.py decks/_sample/deck.html --preview`로 직접 빌드해 볼 수 있다.
 
 ## 구조
 
@@ -71,7 +71,8 @@ harness/                    규칙의 정본과 검사기가 쓰는 어휘
 design/                     디자인 시스템
   deck.css                    토큰(색, Pretendard 굵기)과 팔레트 4종, 부품 스타일
   palettes.png                팔레트 4종 비교 그림
-  parts.html                  부품 47종 (표·서사 25종, 컨설팅 도형 22종)
+  parts.html                  부품 61종 (표·서사 25종, 컨설팅 도형 22종, 데이터 도표 10종, 기본 차트 4종)
+  nchart.js                   기본 차트(원형, 도넛, 꺾은선, 영역)의 HTML 미리보기 렌더러. new_deck.py가 덱에 넣는다
   catalog.md                  전하려는 내용에 맞는 부품 고르기
   typography.md               Pretendard 굵기 구분
   fonts/                      Pretendard (SIL OFL)
@@ -85,6 +86,8 @@ scripts/
 engine/
   html_dump.mjs, lib_cdp.mjs  Chrome으로 그린 요소의 위치와 모양을 기록
   html_to_pptx.py             그 기록을 PowerPoint 도형으로 조립
+  native_chart.py             .nchart를 PowerPoint 기본 차트로 만듦 (데이터 편집 가능)
+  freeze_charts.mjs           Figma용 HTML에 기본 차트의 SVG를 고정해 넣음
   check_layout.mjs            화면 검사 (글꼴, 줄 수, 넘침, 빈 공간)
   figma_post.js               Figma로 보낸 뒤 프레임 이름과 배치 정리
   site_logos.mjs              Chrome으로 홈페이지를 열어 로고 요소를 찾고 투명 PNG로 따냄

@@ -513,3 +513,154 @@ table.t td.no{font-size:30px;line-height:36px;font-weight:var(--w-num);color:var
 .cover.hero .cv-title{top:230px;font-size:56px;line-height:68px;right:560px}
 .cover.hero .cv-rule{top:330px}
 .cover.hero .cv-sub{top:356px;font-size:20px;line-height:30px;right:560px}
+
+/* ============================================================
+   데이터 도표 추가분 (p48~p57)
+   도트 매트릭스, 비례 원, 소형 도표 나열, KPI 대시보드는 vendor/consulting-pptx-skill의 부품 15·22, 추가 부품 P.4·P.9,
+   성장률 표시 막대는 vendor/mckinsey-pptx의 column_split_growth를 참고했다. 메코, 덤벨, 증감 막대, 목표 대비, 코호트 표는 새로 짰다.
+   L6(강조색 도형 3개 이하)을 넘지 않도록 계열 전체를 칠하는 자리에는 --accent 대신 --primary를 쓴다.
+   ============================================================ */
+
+/* ── 도트 매트릭스: 점 100개, 앞에서부터 on ── */
+.dm{display:flex;align-items:center;gap:40px;flex:1;min-height:0;padding:12px 0 8px 0}
+.dm-v{flex:0 0 150px}
+.dm-v .v{font-size:52px;line-height:62px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.02em}
+.dm-v .ds{font-size:14px;line-height:20px;color:var(--ink);margin-top:6px}
+.dm-g{display:grid;grid-template-columns:repeat(10,26px);gap:10px}
+.dm-g i{display:block;width:26px;height:26px;border-radius:50%;background:var(--bar)}
+.dm-g i.on{background:var(--primary)}
+
+/* ── 시장 규모 원: 바닥을 맞춘 원 세 개 ── */
+.pc{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:12px}
+.pc .box{position:relative;width:340px;height:340px}
+.pc .o{position:absolute;left:50%;bottom:0;border-radius:50%}
+.pc .c1{width:340px;height:340px;margin-left:-170px;background:var(--soft)}
+.pc .c2{width:220px;height:220px;margin-left:-110px;background:var(--bar)}
+.pc .c3{width:110px;height:110px;margin-left:-55px;background:var(--accent)}
+.pc .lb{position:absolute;left:60px;right:60px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.pc .lb .n{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--ink)}
+.pc .lb .v{font-size:18px;line-height:24px;font-weight:var(--w-num);color:var(--primary)}
+.pc .l1{top:30px}
+.pc .l2{top:150px}
+.pc .l3{top:265px}
+.pc .l3 .n,.pc .l3 .v{color:var(--on-primary)}
+
+/* ── 성장률 표시 세로 막대: colchart 위에 구간 괄호 ── */
+.colchart .cagr{display:grid;column-gap:28px;padding:0 20px 12px 20px;flex:0 0 auto}
+.colchart .cagr>div{display:flex;flex-direction:column;align-items:center}
+.colchart .cagr span{font-size:13px;line-height:18px;color:var(--ink);margin-bottom:5px;white-space:nowrap}
+.colchart .cagr span b{color:var(--accent)}
+.colchart .cagr i{display:block;align-self:stretch;height:8px;border:1.5px solid var(--muted);border-bottom:0}
+.legend i.fc{background:var(--soft);border:1px dashed var(--accent)}
+
+/* ── 소형 도표 나열: 같은 축의 작은 세로 막대 세 개 ── */
+.smx{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;flex:1;min-height:0;padding-top:4px}
+.smx .pn{display:flex;flex-direction:column;min-height:0}
+.smx .pt{font-size:16px;line-height:22px;font-weight:var(--w-head);color:var(--primary);margin-bottom:6px}
+.smx .colchart .plot{gap:14px;padding:0 8px;min-height:120px}
+.smx .colchart .xs{gap:14px;padding:6px 8px 0 8px}
+.smx .colchart .cb{max-width:60px}
+.smx .rd{font-size:14.5px;line-height:22px;color:var(--ink);margin-top:12px;padding-top:10px;border-top:1px solid var(--hair);min-height:56px}
+
+/* ── KPI 대시보드: 괘선으로 나눈 3열 2행 ── */
+.kd{display:grid;grid-template-columns:repeat(3,1fr);flex:0 0 auto}
+.kd .kt{padding:18px 26px 20px 26px;border-left:1px solid var(--rule);border-top:1px solid var(--rule);display:flex;flex-direction:column}
+.kd .kt:nth-child(3n+1){padding-left:0;border-left:0}
+.kd .kt:nth-child(-n+3){border-top:0;padding-top:4px}
+.kd .lb{font-size:14px;line-height:19px;font-weight:var(--w-label);color:var(--muted)}
+.kd .vr{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:4px}
+.kd .v{font-size:40px;line-height:50px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.02em}
+.kd .sp{display:flex;align-items:flex-end;gap:4px;height:40px;margin-bottom:8px;flex:0 0 auto}
+.kd .sp i{display:block;width:9px;background:var(--bar)}
+.kd .sp i.on{background:var(--primary)}
+.kd .dl{font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--ink);margin-top:4px}
+.kd .dl.up{color:var(--accent)}
+.kd .dl.dn{color:var(--neg)}
+.kd .ds{font-size:12.5px;line-height:18px;color:var(--muted);margin-top:2px}
+
+/* ── 메코 차트: 열 너비는 flex, 조각 높이는 % ── */
+.mk{display:flex;gap:4px;flex:1;min-height:0;padding-top:10px}
+.mk .mc{display:flex;flex-direction:column;min-width:0}
+.mk .tv{font-size:13px;line-height:18px;font-weight:var(--w-head);color:var(--primary);text-align:center;margin-bottom:4px}
+.mk .segs{flex:1;min-height:150px;display:flex;flex-direction:column;border-bottom:1.5px solid var(--primary)}
+.mk .sg{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:var(--w-head);color:var(--primary);background:var(--bar);border-top:2px solid var(--slide-bg)}
+.mk .sg:first-child{border-top:0}
+.mk .sg.a{background:var(--primary);color:var(--on-primary)}
+.mk .sg.c{background:var(--bar)}
+.mk .sg.d{background:var(--soft)}
+.mk .sg.on{background:var(--accent);color:var(--on-primary)}
+.mk .nm{font-size:12.5px;line-height:17px;color:var(--muted);text-align:center;margin-top:7px;height:34px}
+
+/* ── 전후 비교 덤벨: 점의 left, 선의 left와 width를 % ── */
+.db{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.db .row{display:grid;grid-template-columns:150px 1fr 80px;align-items:center;gap:18px;height:60px;border-bottom:1px solid var(--hair)}
+.db .nm{font-size:15px;line-height:20px;color:var(--ink)}
+.db .trk{position:relative;height:100%}
+.db .ln{position:absolute;top:50%;height:3px;margin-top:-1px;background:var(--bar)}
+.db .d{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--bar)}
+.db .d.b{background:var(--primary)}
+.db .d span{position:absolute;bottom:17px;left:-33px;width:80px;text-align:center;font-size:12.5px;line-height:16px;font-weight:var(--w-head);color:var(--muted);white-space:nowrap}
+.db .d.a span{bottom:auto;top:17px}  /* 앞 시점 값은 점 아래, 뒤 시점 값은 점 위: 두 점이 가까워도 겹치지 않는다 */
+.db .d.b span{color:var(--primary)}
+.db .val{font-size:15px;font-weight:var(--w-head);color:var(--primary);text-align:right}
+.db .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.db .row.on .d.b{background:var(--accent)}
+.db .row.on .d.b span,.db .row.on .val{color:var(--accent)}
+.db .row.ax{height:26px;border-bottom:0;align-items:flex-start;padding-top:6px}
+.db .tk{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+
+/* ── 증감 가로 막대: 가운데 0선에서 좌우로 ── */
+.dv{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.dv .row{display:grid;grid-template-columns:150px 1fr 1fr;align-items:stretch;height:44px;border-bottom:1px solid var(--hair)}
+.dv .row:last-child{border-bottom:0}
+.dv .nm{font-size:15px;line-height:20px;color:var(--ink);display:flex;align-items:center;padding-right:14px}
+.dv .l,.dv .r{display:flex;align-items:center;gap:8px}
+.dv .l{justify-content:flex-end}
+.dv .r{border-left:1.5px solid var(--primary)}
+.dv .bar{height:20px;background:var(--bar)}
+.dv span{font-size:14px;font-weight:var(--w-head);color:var(--primary);white-space:nowrap}
+.dv .l span{color:var(--neg)}
+.dv .row.hd{height:26px;border-bottom:0}
+.dv .row.hd span{font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.dv .row.hd .l{padding-right:10px}
+.dv .row.hd .r{padding-left:10px}
+.dv .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.dv .row.on .bar{background:var(--accent)}
+.dv .row.on span{color:var(--accent)}
+
+/* ── 목표 대비 달성: 실적 막대와 목표선 ── */
+.tg{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.tg .row{display:grid;grid-template-columns:140px 1fr 120px 76px;align-items:center;gap:14px;height:52px;border-bottom:1px solid var(--hair)}
+.tg .row:last-child{border-bottom:0}
+.tg .nm{font-size:15px;line-height:20px;color:var(--ink)}
+.tg .trk{position:relative;height:24px;background:var(--hair)}
+.tg .bar{height:100%;background:var(--bar)}
+.tg .tm{position:absolute;top:-6px;bottom:-6px;width:3px;margin-left:-1px;background:var(--primary)}
+.tg .val{font-size:14.5px;font-weight:var(--w-head);color:var(--primary);text-align:right;white-space:nowrap}
+.tg .val span{font-weight:var(--w-body);color:var(--muted)}
+.tg .rt{font-size:15px;font-weight:var(--w-head);color:var(--primary);text-align:right}
+.tg .rt.dn{color:var(--neg)}
+.tg .row.hd{height:24px}
+.tg .row.hd span{font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.tg .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.tg .row.on .bar{background:var(--accent)}
+.tg .row.on .rt{color:var(--accent)}
+.legend i.tm{width:3px;height:14px;background:var(--primary)}
+
+/* ── 코호트 리텐션 표: 히트맵 표에서 가장 짙은 단계를 --primary로 ── */
+table.t.cohort td.h3{background:var(--primary)}
+table.t.cohort td.na{background:none}
+table.t.cohort th{font-size:13px}
+table.t.cohort td{height:46px}
+
+/* ============================================================
+   PowerPoint 기본 차트 (p58~p61): 원형, 도넛, 꺾은선, 영역
+   design/nchart.js가 data-chart의 수치로 SVG 미리보기를 그리고, engine/html_to_pptx.py가 같은 자리에 기본 차트를 넣는다.
+   PowerPoint에서 차트를 선택하고 '데이터 편집'으로 수치를 고칠 수 있다. 이 SVG만 S35의 예외다.
+   ============================================================ */
+.nchart{position:relative;flex:1;min-height:220px}
+.nchart svg.nc{position:absolute;left:0;top:0;display:block;overflow:visible}
+.nchart svg text{font-family:var(--font)}
+.nchart .nc-ctr{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.nchart .nc-ctr .v{font-size:30px;line-height:36px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.01em}
+.nchart .nc-ctr .lb{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--muted)}

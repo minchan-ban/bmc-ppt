@@ -13,6 +13,7 @@ FAIL이 하나라도 있으면 내보내지 않는다 (--draft 제외). 검사�
 """
 import argparse
 import base64
+import json
 import re
 import shutil
 import subprocess
@@ -40,6 +41,21 @@ def run(title, cmd, allow_fail=False):
     return r.returncode == 0
 
 
+def freeze_charts(deck: Path, body: str) -> str:
+    """기본 차트(.nchart)가 있으면 Chrome이 차트를 그린 뒤의 <main> 안쪽 HTML로 본문을 바꾼다.
+    Figma가 스크립트를 실행하지 않아도 차트가 SVG로 보이게 하기 위해서다."""
+    if "nchart" not in body:
+        return body
+    r = subprocess.run(["node", str(ROOT / "engine" / "freeze_charts.mjs"), str(deck)], capture_output=True, text=True, timeout=180)
+    if r.returncode != 0:
+        print(f"주의: 기본 차트를 SVG로 고정하지 못했다 ({r.stderr.strip()[:200]}). Figma에서 차트가 비어 보일 수 있다")
+        return body
+    res = json.loads(r.stdout)
+    for e in res.get("errors", []):
+        print(f"주의: 그리지 못한 기본 차트가 있다: {e}")
+    return "\n" + res["main"] + "\n" if res.get("main") else body
+
+
 def figma_html(deck: Path, out_dir: Path):
     """Figma로 보낼 HTML을 만든다. 글꼴을 파일 안에 넣고(외부 자원은 Figma가 가져오지 않는다), 20장씩 나눈다."""
     raw = deck.read_text(encoding="utf-8")
@@ -63,6 +79,7 @@ def figma_html(deck: Path, out_dir: Path):
             return m.group(0)
         mime = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "svg": "image/svg+xml", "webp": "image/webp"}.get(f.suffix.lower().lstrip("."), "image/png")
         return f'{m.group(1)}data:{mime};base64,{base64.b64encode(f.read_bytes()).decode()}{m.group(3)}'
+    body = freeze_charts(deck, body)   # 그림을 파일 안에 넣기 전에 바꾼다 (차트를 그린 뒤의 본문으로 통째로 바뀐다)
     body = re.sub(r'(<img\b[^>]*?\bsrc=")([^"]+)(")', inline_img, body)
     sections = re.findall(r"(?:<!--[^>]*-->\s*)?<section.*?</section>", body, flags=re.S)
     out_dir.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>도표 부품 시연</title>
+<!-- scripts/new_deck.py로 생성. 이 HTML이 덱의 원본이다. 내용 수정은 여기서 하고 scripts/build.py로 PPTX·PDF·Figma용 파일을 다시 만든다.
+     규칙: harness/headline-rules.md, harness/slide-rules.md / 검사: python3 scripts/check_deck.py deck.html -->
+<style>
+/*deck.css:start*/
+/* ============================================================
+   bmc-ppt 디자인 시스템 (16:9, 1280×720px, 1 section = 1 슬라이드)
+   - 색상과 글꼴은 아래 토큰에서만 바꾼다. 부품 CSS에 색상 값을 직접 쓰지 않는다.
+   - PPTX·Figma 변환 제약: transform, ::before/::after 장식, SVG, color-mix()를 쓰지 않는다.
+     (SVG는 이미지로 변환되어 편집할 수 없고, 나머지는 변환기가 재현하지 못한다)
+   - 1px = 0.75pt. 본문 15px는 PowerPoint에서 11.25pt가 된다.
+   ============================================================ */
+
+/* ── 공통 토큰 ── */
+:root{
+  --font:"Pretendard","Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  /* Pretendard 굵기 용도 (design/typography.md 참조) */
+  --w-body:400;      /* 본문, 표의 셀 */
+  --w-label:500;     /* 라벨, 키커, 축 단위, 출처 강조 */
+  --w-head:600;      /* 헤드메시지, 열 제목, 표 머리글, 본문 내 강조 */
+  --w-cover:700;     /* 표지 제목, 장 구분 제목 */
+  --w-num:800;       /* 핵심 수치 */
+
+  /* 브랜드 색: 기본값. 회사 색은 brand.json에 적으면 new_deck.py가 덱마다 덮어쓴다 */
+  --brand:#D9415F;       /* 기본 로즈 */
+  --brand-soft:#FBE9ED;
+
+  --neg:#8F1D14;     /* 악화·불가 등 의미를 가진 빨강. 테마가 바뀌어도 유지. 브랜드 로즈와 구분되도록 어두운 적갈색 */
+  --page-bg:#E9EBEE;
+  --slide-bg:#FFFFFF;
+}
+
+/* ── 팔레트 ──
+   덱마다 네 가지 가운데 하나를 고른다 (new_deck.py --palette). 기본은 rose다.
+   강조색은 모두 브랜드 색(--brand)이고, 글자색(--primary)과 짙은 면(--panel)에서 차이가 난다.
+   --panel: 표지의 띠, 장 구분, 주장 패널, 강조한 단계처럼 짙게 채우는 면의 색 */
+
+/* A. rose: 차콜 + 로즈 포인트 (기본). 가장 절제된 구성. 로즈는 강조 막대와 라벨에만 나온다 */
+:root,[data-theme="rose"]{
+  --ink:#232326;       /* 본문 */
+  --primary:#18181C;   /* 헤드메시지, 굵은 괘선 */
+  --panel:#18181C;     /* 짙은 면 */
+  --accent:var(--brand); /* 강조 막대, 축 라벨, 번호 */
+  --muted:#6B6B73;     /* 출처, 주석, 보조 라벨 */
+  --rule:#CFCFD4;      /* 행 사이 괘선 */
+  --hair:#E7E7EA;      /* 더 옅은 괘선 */
+  --soft:var(--brand-soft); /* 의미 있는 옅은 채움 */
+  --bar:#C9C9CF;       /* 비강조 막대 */
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#B9B9C0;
+}
+/* B. rose-panel: 차콜 글자 + 로즈 면. 표지의 띠와 패널이 로즈로 채워져 브랜드가 가장 강하게 드러난다 */
+[data-theme="rose-panel"]{
+  --ink:#232326;
+  --primary:#18181C;
+  --panel:var(--brand);
+  --accent:var(--brand);
+  --muted:#6B6B73;
+  --rule:#CFCFD4;
+  --hair:#E7E7EA;
+  --soft:var(--brand-soft);
+  --bar:#C9C9CF;
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#FBD3DB;
+}
+/* C. berry: 버건디 + 로즈. 헤드메시지까지 붉은 계열이고 비강조 막대도 연한 핑크다 */
+[data-theme="berry"]{
+  --ink:#2A1F24;
+  --primary:#6E1A33;
+  --panel:#6E1A33;
+  --accent:var(--brand);
+  --muted:#7A6A70;
+  --rule:#D9C9CE;
+  --hair:#EDE3E6;
+  --soft:var(--brand-soft);
+  --bar:#E3B7C2;
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#EBB9C6;
+}
+/* D. navy-rose: 네이비 + 로즈 포인트. 금융권처럼 보수적인 상대에게 보낼 때 */
+[data-theme="navy-rose"]{
+  --ink:#1B2230;
+  --primary:#0B2545;
+  --panel:#0B2545;
+  --accent:var(--brand);
+  --muted:#667085;
+  --rule:#C5CBD3;
+  --hair:#E3E7EC;
+  --soft:var(--brand-soft);
+  --bar:#B8C2D1;
+  --on-primary:#FFFFFF;
+  --on-primary-sub:#A9BAD3;
+}
+
+/* ── 캔버스 ── */
+@page{size:1280px 720px;margin:0}
+html,body{margin:0;background:var(--page-bg);font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{display:block}
+.slide{width:1280px;height:720px;background:var(--slide-bg);position:relative;margin:24px auto;box-sizing:border-box;
+  padding:34px 56px 0 56px;overflow:hidden;page-break-after:always;display:flex;flex-direction:column;font-weight:var(--w-body);word-break:keep-all}
+.slide *{box-sizing:border-box}
+@media print{html,body{background:#fff}.slide{margin:0}}
+
+/* ── 머리 영역: 모든 본문 슬라이드에서 높이가 같다 ── */
+.top{display:flex;justify-content:space-between;align-items:center;height:16px;flex:0 0 auto}
+.top .brand{font-size:11px;font-weight:var(--w-head);color:var(--primary);letter-spacing:.02em}
+.top .kicker{font-size:11px;font-weight:var(--w-label);color:var(--muted)}
+/* 헤드메시지: 2줄까지. 영역 높이를 고정해서 본문 시작 위치를 전 슬라이드에서 맞춘다 */
+.title{margin:12px 0 0 0;height:74px;font-size:27px;line-height:36px;font-weight:var(--w-head);color:var(--primary);
+  letter-spacing:-.01em;flex:0 0 auto;word-break:keep-all}
+.hr{height:0;border-top:1.5px solid var(--primary);margin-top:8px;flex:0 0 auto}
+
+/* ── 본문 영역 ── */
+.body{margin-top:20px;margin-bottom:66px;flex:1;min-height:0;display:flex;flex-direction:column;gap:16px}
+.body.mid{justify-content:center}
+.src{position:absolute;left:56px;right:56px;bottom:42px;font-size:10.5px;line-height:14px;color:var(--muted)}
+.foot{position:absolute;left:56px;right:56px;bottom:14px;height:20px;border-top:1px solid var(--hair);padding-top:6px;
+  display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.foot .pg{font-weight:var(--w-label);color:var(--ink)}
+
+/* ── 공통 글자 ── */
+b,strong,.em{font-weight:var(--w-head);color:var(--primary)}
+.muted{color:var(--muted)}
+.acc{color:var(--accent)}
+.neg{color:var(--neg)}
+/* 축 제목: 도표 바로 위에 두는 "무엇의 데이터인지 + 단위·기간" 한 줄 */
+.axh{display:flex;justify-content:space-between;align-items:flex-end;height:30px;padding-bottom:7px;border-bottom:1.5px solid var(--primary);
+  font-size:16px;font-weight:var(--w-head);color:var(--primary);flex:0 0 auto}
+.axh .u{font-size:11.5px;font-weight:var(--w-body);color:var(--muted)}
+/* 열 제목: 2단 구성에서 각 단의 제목. 좌우 높이와 괘선 위치가 같다 */
+.colh{display:flex;align-items:flex-end;height:30px;padding-bottom:7px;border-bottom:1.5px solid var(--primary);
+  font-size:16px;font-weight:var(--w-head);color:var(--primary);flex:0 0 auto}
+
+/* ── 글머리표 ── */
+ul.bl{margin:0;padding:0 0 0 19px;font-size:16px;line-height:26px;color:var(--ink);list-style:disc}
+ul.bl>li{margin:0 0 10px 0;padding-left:2px}
+ul.bl>li:last-child{margin-bottom:0}
+ul.bl ul{margin:5px 0 0 0;padding:0 0 0 18px;list-style:"– ";font-size:15px;line-height:23px;color:var(--ink)}
+ul.bl ul>li{margin:0 0 3px 0}
+ul.bl.lg{font-size:18px;line-height:29px}
+ul.bl.sm{font-size:13.5px;line-height:21px}
+ul.bl.sm>li{margin-bottom:6px}
+
+/* ── 2단·3단 구성 ── */
+.cols{display:grid;grid-template-columns:1.45fr 1fr;gap:40px;flex:1;min-height:0}
+.cols.eq{grid-template-columns:1fr 1fr}
+.cols.w3{grid-template-columns:1fr 1fr 1fr;gap:32px}
+.cols.arrow{grid-template-columns:1.3fr 22px 1fr;gap:22px}
+.cols>div{display:flex;flex-direction:column;min-height:0}
+.cols>div>.fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:14px}
+.cols>div>.fill.up{justify-content:flex-start}
+/* 전제 → 귀결의 인과를 나타내는 삼각형 (좌우 사이에 하나만) */
+.tri{align-self:center;width:0;height:0;border-top:13px solid transparent;border-bottom:13px solid transparent;border-left:16px solid var(--bar)}
+
+/* ── 표: 채움 없이 괘선으로 축을 나타낸다 ── */
+table.t{border-collapse:collapse;width:100%;font-size:15px;line-height:23px;color:var(--ink)}
+table.t.eq{table-layout:fixed}
+table.t th{text-align:left;vertical-align:bottom;padding:0 10px 7px 10px;height:30px;font-size:16px;line-height:21px;font-weight:var(--w-head);
+  color:var(--primary);border-bottom:1.5px solid var(--primary);background:none}
+table.t td{padding:11px 10px;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t th:first-child,table.t td:first-child{padding-left:0}
+table.t td.ax{font-size:16px;font-weight:var(--w-head);color:var(--primary)}
+table.t td.num,table.t th.num{text-align:right}
+table.t td.ctr,table.t th.ctr{text-align:center}
+table.t td.big{font-size:22px;line-height:28px;font-weight:var(--w-num);color:var(--primary)}
+table.t td.na{color:var(--muted);background:var(--soft)}
+table.t tr.focus td{background:var(--soft)}
+table.t td ul{margin:0;padding:0 0 0 16px;list-style:disc}
+table.t td ul li{margin:0 0 2px 0}
+.body>table.t{flex:0 0 auto}
+table.t.tall td{padding-top:20px;padding-bottom:20px;font-size:16px;line-height:25px}
+table.t.tall td.ax{font-size:17px}
+table.t.dense td{padding-top:7px;padding-bottom:7px;font-size:13px;line-height:19px}
+
+/* ── 핵심 수치 ── */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:0;flex:0 0 auto}
+.kpis.k4{grid-template-columns:repeat(4,1fr)}
+.kpis.k2{grid-template-columns:repeat(2,1fr)}
+.kpi{padding:4px 24px 6px 24px;border-left:1px solid var(--rule);display:flex;flex-direction:column}
+.kpi:first-child{padding-left:0;border-left:0}
+.kpi .lb{font-size:14px;line-height:19px;font-weight:var(--w-label);color:var(--muted)}
+.kpi .v{font-size:52px;line-height:62px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.02em;margin-top:4px}
+.kpi .v .un{font-size:22px;font-weight:var(--w-head);letter-spacing:0;margin-left:2px}
+.kpi .v.acc{color:var(--accent)}
+.kpi .ds{font-size:14.5px;line-height:21px;color:var(--ink);margin-top:6px}
+
+/* ── 가로 막대 (항목 비교·순위) ── */
+.bars{display:flex;flex-direction:column;gap:0;flex:1;min-height:0;justify-content:center}
+.bars .row{display:grid;grid-template-columns:170px 1fr 84px;align-items:center;gap:14px;height:44px;border-bottom:1px solid var(--hair)}
+.bars .row:last-child{border-bottom:0}
+.bars .nm{font-size:15px;line-height:20px;color:var(--ink)}
+.bars .trk{height:22px;display:flex}
+.bars .bar{height:22px;background:var(--bar)}
+.bars .val{font-size:15px;font-weight:var(--w-head);color:var(--primary);text-align:right}
+.bars .row.on .bar{background:var(--accent)}
+.bars .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.bars .row.on .val{color:var(--accent)}
+.bars .row.fc .bar{background:transparent;border:1.5px dashed var(--bar)}  /* 추정치: 점선 막대 */
+.bars .row.fc .val{color:var(--muted)}
+
+/* ── 세로 막대 (시계열) ── */
+.colchart{display:flex;flex-direction:column;flex:1;min-height:0}
+.colchart .plot{flex:1;min-height:150px;display:flex;align-items:flex-end;gap:28px;padding:0 20px;border-bottom:1.5px solid var(--primary)}
+.colchart .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.colchart .cv{font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--primary);margin-bottom:5px}
+.colchart .cb{width:100%;max-width:92px;background:var(--bar)}
+.colchart .col.on .cb{background:var(--accent)}
+.colchart .col.on .cv{color:var(--accent)}
+.colchart .col.fc .cb{background:var(--soft);border:1px dashed var(--accent)}
+.colchart .xs{display:flex;gap:28px;padding:7px 20px 0 20px;flex:0 0 auto}
+.colchart .xs div{flex:1;text-align:center;font-size:12.5px;line-height:17px;color:var(--muted)}
+
+/* ── 누적 가로 막대 (구성비) ── */
+.stack{display:flex;height:40px;flex:0 0 auto}
+.stack .sg{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:var(--w-head);color:var(--on-primary);background:var(--bar)}
+.stack .sg.a{background:var(--primary)}
+.stack .sg.b{background:var(--accent)}
+.stack .sg.c{background:var(--bar);color:var(--primary)}
+.stack .sg.d{background:var(--soft);color:var(--primary)}
+.legend{display:flex;gap:20px;font-size:11.5px;line-height:16px;color:var(--ink);flex:0 0 auto}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;display:block;background:var(--bar)}
+.legend i.a{background:var(--primary)}.legend i.b{background:var(--accent)}.legend i.c{background:var(--bar)}.legend i.d{background:var(--soft)}
+
+/* ── 단계 화살표 ── */
+.chev{display:flex;gap:6px;flex:0 0 auto}
+.chev .cv{flex:1;height:60px;background:var(--soft);display:flex;align-items:center;padding:0 22px 0 34px;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%)}
+.chev .cv:first-child{padding-left:20px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%)}
+.chev .cv span{font-size:16px;font-weight:var(--w-head);color:var(--primary)}
+.chev .cv.on{background:var(--panel)}
+.chev .cv.on span{color:var(--on-primary)}
+.chevx{display:flex;gap:6px;flex:1;min-height:0}
+.chevx>div{flex:1;padding:16px 22px 4px 2px;border-right:1px solid var(--hair)}
+.chevx>div:last-child{border-right:0}
+.chevx .st{font-size:13px;line-height:18px;font-weight:var(--w-label);color:var(--accent);margin-bottom:8px}
+
+/* ── 계산 흐름 (바텀업 시장 규모 등) ── */
+.calc{display:flex;align-items:stretch;gap:0;flex:0 0 auto}
+.calc .cx{flex:1;border-top:1.5px solid var(--primary);padding:12px 14px 4px 0;display:flex;flex-direction:column}
+.calc .cx .lb{font-size:13px;line-height:18px;font-weight:var(--w-label);color:var(--muted)}
+.calc .cx .v{font-size:34px;line-height:44px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.01em}
+.calc .cx .ds{font-size:14px;line-height:20px;color:var(--ink);margin-top:3px}
+.calc .op{flex:0 0 40px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:var(--w-label);color:var(--muted)}
+.calc .cx.res{border-top-color:var(--accent)}
+.calc .cx.res .v{color:var(--accent)}
+
+/* ── 2×2 매트릭스 ── */
+.mx{display:grid;grid-template-columns:1fr;grid-template-rows:24px 1fr 26px;flex:1;min-height:0}
+.mx .ylab{display:flex;align-items:flex-start;justify-content:space-between;font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.mx .xlab{display:flex;align-items:flex-end;justify-content:space-between;font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.mx .plane{position:relative;border-left:1.5px solid var(--primary);border-bottom:1.5px solid var(--primary)}
+.mx .vline{position:absolute;left:50%;top:0;bottom:0;width:0;border-left:1px dashed var(--rule)}
+.mx .hline{position:absolute;top:50%;left:0;right:0;height:0;border-top:1px dashed var(--rule)}
+.mx .q{position:absolute;font-size:11.5px;color:var(--muted)}
+.mx .pt{position:absolute;display:flex;align-items:center;gap:7px}
+.mx .pt i{width:14px;height:14px;border-radius:50%;background:var(--bar);display:block;flex:0 0 auto}
+.mx .pt span{font-size:13px;color:var(--ink);white-space:nowrap}
+.mx .pt.on i{background:var(--accent);width:18px;height:18px}
+.mx .pt.on span{font-weight:var(--w-head);color:var(--primary)}
+
+/* ── 충족도 기호 (표 안에서 사용. 모두 편집 가능한 도형으로 변환된다) ── */
+.hb{display:inline-block;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--primary);vertical-align:-2px;position:relative}
+.hb.f{background:var(--primary)}
+.hb.h i{position:absolute;left:3px;top:3px;width:6px;height:6px;border-radius:50%;background:var(--primary);display:block}
+
+/* ── 짙은 주장 패널 + 근거 ── */
+.side{display:grid;grid-template-columns:300px 1fr;gap:36px;flex:1;min-height:0}
+.side .sp{background:var(--panel);padding:26px 26px;display:flex;flex-direction:column;justify-content:flex-end}
+.side .sp .sn{font-size:50px;line-height:60px;font-weight:var(--w-num);color:var(--on-primary);letter-spacing:-.02em}
+.side .sp .sl{font-size:14px;line-height:19px;font-weight:var(--w-label);color:var(--on-primary-sub);margin-bottom:auto}
+.side .sp .sm{font-size:17px;line-height:26px;font-weight:var(--w-head);color:var(--on-primary);margin-top:10px}
+.side .sb{display:flex;flex-direction:column;min-height:0}
+
+/* ── 제품 화면 자리 ── */
+.shot{flex:1;min-height:0;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;background:var(--soft)}
+.shot span{font-size:13px;color:var(--muted)}
+.shot img{max-width:100%;max-height:100%;display:block}
+
+/* ── 로고 ──
+   로고 파일은 scripts/logo.py로 만든 투명 PNG를 쓴다 (harness/logo-rules.md).
+   로고 모음: 칸의 크기를 고정하고 로고를 그 안에 맞춘다. 높이를 같게 맞추면 가로로 긴 로고가 커 보이므로 너비도 함께 제한한다 */
+.logos{display:grid;grid-template-columns:repeat(5,1fr);gap:0;flex:0 0 auto;border-top:1px solid var(--hair)}
+.logos.c4{grid-template-columns:repeat(4,1fr)}
+.logos.c6{grid-template-columns:repeat(6,1fr)}
+.logos .lg{height:104px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--hair)}
+.logos .lg img{max-height:38px;max-width:62%;display:block}
+.logos .lg span{font-size:12px;color:var(--muted)}
+/* 표의 칸, 열 제목, 표지에 넣는 로고 */
+img.lgi{height:22px;width:auto;display:block}
+td img.lgi{height:20px}
+.top .brand img{height:13px;width:auto;display:block}
+.cover .cv-brand img,.back .bk-brand img{height:30px;width:auto;display:block}
+.cover .cv-with{position:absolute;left:76px;bottom:104px;display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted)}
+.cover .cv-with img{height:26px;width:auto;display:block}
+
+/* ── 핵심 요약 ── */
+.exec{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.exec .ex{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule)}
+.exec .ex:last-child{border-bottom:0}
+.exec .ex .no{font-size:15px;line-height:24px;font-weight:var(--w-head);color:var(--accent)}
+.exec .ex .mn{font-size:17px;line-height:25px;font-weight:var(--w-head);color:var(--primary)}
+.exec .ex ul{margin:5px 0 0 0;padding:0 0 0 18px;list-style:disc;font-size:15px;line-height:23px;color:var(--ink)}
+
+/* ── 표지, 장 구분, 뒤표지 ── */
+.slide.cover,.slide.back{padding:0}
+.cover .cv-l{position:absolute;left:0;top:0;bottom:0;width:20px;background:var(--panel)}
+.cover .cv-brand{position:absolute;left:76px;top:56px;font-size:15px;font-weight:var(--w-head);color:var(--primary);letter-spacing:.02em}
+.cover .cv-title{position:absolute;left:76px;right:120px;top:238px;font-size:46px;line-height:60px;font-weight:var(--w-cover);color:var(--primary);letter-spacing:-.02em;word-break:keep-all}
+.cover .cv-rule{position:absolute;left:76px;top:392px;width:64px;height:4px;background:var(--accent)}
+.cover .cv-sub{position:absolute;left:76px;right:120px;top:416px;font-size:19px;line-height:28px;font-weight:var(--w-label);color:var(--ink)}
+.cover .cv-meta{position:absolute;left:76px;bottom:52px;font-size:12.5px;line-height:19px;color:var(--muted)}
+.slide.divider{background:var(--panel);padding:0}
+.divider .dv-no{position:absolute;left:76px;top:262px;font-size:15px;font-weight:var(--w-label);color:var(--on-primary-sub);letter-spacing:.08em}
+.divider .dv-title{position:absolute;left:76px;right:120px;top:292px;font-size:38px;line-height:50px;font-weight:var(--w-cover);color:var(--on-primary);letter-spacing:-.01em}
+.divider .dv-sub{position:absolute;left:76px;right:120px;top:368px;font-size:16px;line-height:24px;color:var(--on-primary-sub)}
+.back .bk-brand{position:absolute;left:76px;top:300px;font-size:34px;line-height:44px;font-weight:var(--w-cover);color:var(--primary)}
+.back .bk-rule{position:absolute;left:76px;top:360px;width:64px;height:4px;background:var(--accent)}
+.back .bk-meta{position:absolute;left:76px;top:384px;font-size:14px;line-height:23px;color:var(--ink)}
+.back .cv-l{position:absolute;left:0;top:0;bottom:0;width:20px;background:var(--panel)}
+
+/* ============================================================
+   컨설팅 도형 묶음 (p26~p47)
+   원본의 구조는 vendor/consulting-pptx-skill의 부품 62종과 vendor/mckinsey-pptx의 템플릿 40종을 참고했다.
+   모두 div 도형이라 PPTX에서 사각형·타원·다각형·선으로 변환된다. 수치에 맞춰 style의 비율(%)을 고친다.
+   ============================================================ */
+.tri.d{border:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:16px solid var(--bar)}
+.tri.u{border:0;border-left:13px solid transparent;border-right:13px solid transparent;border-bottom:16px solid var(--bar)}
+.tri.l{border:0;border-top:13px solid transparent;border-bottom:13px solid transparent;border-right:16px solid var(--bar)}
+.xs{display:flex;gap:22px;padding:7px 16px 0 16px;flex:0 0 auto}
+.xs div{flex:1;text-align:center;font-size:12.5px;line-height:17px;color:var(--muted)}
+
+/* ── 폭포 (증감 브리지): 막대의 bottom과 height를 %로 준다 ── */
+.wf{display:flex;flex-direction:column;flex:1;min-height:0}
+.wf .plot{flex:1;min-height:190px;display:flex;gap:22px;padding:0 16px;border-bottom:1.5px solid var(--primary)}
+.wf .col{flex:1;position:relative}
+.wf .wb{position:absolute;left:14%;right:14%;background:var(--bar)}
+.wf .wv{position:absolute;left:0;right:0;text-align:center;font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--primary)}
+.wf .col.tot .wb{background:var(--primary)}
+.wf .col.up .wb{background:var(--accent)}
+.wf .col.up .wv{color:var(--accent)}
+.wf .col.dn .wb{background:var(--bar)}
+
+/* ── 누적 세로 막대: 조각의 height를 %로 준다 ── */
+.stk{display:flex;flex-direction:column;flex:1;min-height:0}
+.stk .plot{flex:1;min-height:190px;display:flex;align-items:flex-end;gap:30px;padding:0 24px;border-bottom:1.5px solid var(--primary)}
+.stk .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.stk .tv{font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--primary);margin-bottom:5px}
+.stk .sg{width:100%;max-width:96px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:var(--w-head);color:var(--on-primary);background:var(--bar)}
+.stk .sg.a{background:var(--primary)}.stk .sg.b{background:var(--accent)}.stk .sg.c{background:var(--bar);color:var(--primary)}.stk .sg.d{background:var(--soft);color:var(--primary)}
+
+/* ── 묶음 세로 막대: 두 계열을 나란히 ── */
+.grp{display:flex;flex-direction:column;flex:1;min-height:0}
+.grp .plot{flex:1;min-height:190px;display:flex;align-items:flex-end;gap:34px;padding:0 24px;border-bottom:1.5px solid var(--primary)}
+.grp .g{flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:6px}
+.grp .b{width:42px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.grp .b span{white-space:nowrap;font-size:12.5px;line-height:18px;font-weight:var(--w-head);color:var(--primary);margin-bottom:4px}
+.grp .b i{display:block;width:100%;background:var(--bar)}
+.grp .b.on i{background:var(--accent)}
+.grp .b.on span{color:var(--accent)}
+
+/* ── 깔때기: 막대의 width를 %로 준다 ── */
+.fnl{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.fnl .row{display:grid;grid-template-columns:150px 1fr 120px;align-items:center;gap:16px;height:52px}
+.fnl .nm{font-size:15px;line-height:20px;font-weight:var(--w-head);color:var(--primary)}
+.fnl .trk{display:flex;justify-content:center}
+.fnl .fb{white-space:nowrap;height:36px;background:var(--bar);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:var(--w-head);color:var(--primary)}
+.fnl .row.on .fb{background:var(--accent);color:var(--on-primary)}
+.fnl .row.first .fb{background:var(--primary);color:var(--on-primary)}
+.fnl .rt{font-size:13px;line-height:18px;color:var(--muted)}
+.fnl .rt b{font-size:15px}
+
+/* ── 분산형·버블: 점의 left와 top을 %로 준다. 버블은 i의 width와 height도 함께 ── */
+.sc{display:grid;grid-template-columns:44px 1fr;grid-template-rows:1fr 30px;flex:1;min-height:0}
+.sc .yt{white-space:nowrap;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:8px;font-size:11.5px;color:var(--muted)}
+.sc .xt{grid-column:2;display:flex;justify-content:space-between;align-items:flex-end;font-size:11.5px;color:var(--muted)}
+.sc .plane{position:relative;border-left:1.5px solid var(--primary);border-bottom:1.5px solid var(--primary)}
+.sc .gl{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--hair)}
+.sc .pt{position:absolute;display:flex;align-items:center;gap:7px}
+.sc .pt i{width:12px;height:12px;border-radius:50%;background:var(--bar);display:block;flex:0 0 auto}
+.sc .pt span{font-size:12.5px;color:var(--ink);white-space:nowrap}
+.sc .pt.on i{background:var(--accent)}
+.sc .pt.on span{font-weight:var(--w-head);color:var(--primary)}
+.sc .ref{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--rule)}
+.sc .rl{position:absolute;font-size:11.5px;color:var(--muted)}
+
+/* ── 점 추이 (꺾은선 대신): 점의 bottom을 %로 준다 ── */
+.dots{display:flex;flex-direction:column;flex:1;min-height:0}
+.dots .plot{flex:1;min-height:190px;display:flex;gap:22px;padding:0 16px;border-bottom:1.5px solid var(--primary)}
+.dots .col{flex:1;position:relative;border-left:1px solid var(--hair)}
+.dots .col:first-child{border-left:0}
+.dots .d{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center}
+.dots .d span{font-size:13px;line-height:18px;font-weight:var(--w-head);color:var(--muted)}
+.dots .d i{width:12px;height:12px;border-radius:50%;background:var(--bar);display:block}
+.dots .d.on span{color:var(--accent)}
+.dots .d.on i{background:var(--accent)}
+
+/* ── 이슈 트리 ── */
+.tree{display:flex;align-items:stretch;flex:1;min-height:0}
+.tree .root{flex:0 0 210px;display:flex;align-items:center}
+.tree .rb{background:var(--panel);color:var(--on-primary);padding:16px 18px;font-size:16px;line-height:24px;font-weight:var(--w-head);width:100%}
+.tree .ln{flex:0 0 22px;height:0;border-top:1.5px solid var(--primary);align-self:center}
+.tree .brs{flex:1;display:flex;flex-direction:column;justify-content:center}
+.tree .br{display:flex;align-items:stretch}
+.tree .br>.in{flex:1;display:flex;align-items:stretch;padding:8px 0}
+.tree .vt{flex:0 0 0;border-left:1.5px solid var(--primary)}
+.tree .br:first-child .vt{align-self:flex-end;height:50%}
+.tree .br:last-child .vt{align-self:flex-start;height:50%}
+.tree .bb{flex:0 0 230px;background:var(--soft);padding:12px 16px;font-size:15px;line-height:22px;font-weight:var(--w-head);color:var(--primary);display:flex;align-items:center}
+.tree .lfs{flex:1;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--rule);padding:4px 0}
+.tree .lf{display:flex;align-items:center;padding:5px 0}
+.tree .lf .ln{border-top:1px solid var(--rule);flex:0 0 16px}
+.tree .lf span{font-size:14px;line-height:21px;color:var(--ink);padding-left:8px}
+.tree .lf b{padding-left:8px;font-size:14px;line-height:21px}
+
+/* ── 가치 사슬의 범위 띠 ── */
+.band{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;flex:0 0 auto}
+.band.c4{grid-template-columns:repeat(4,1fr)}
+.band .lb{grid-column:1/-1;font-size:12px;line-height:17px;font-weight:var(--w-label);color:var(--muted)}
+.band .bd{height:26px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:var(--w-head);background:var(--bar);color:var(--primary)}
+.band .bd.on{background:var(--accent);color:var(--on-primary)}
+.band .bd.no{background:none;border:1px dashed var(--rule);color:var(--muted);font-weight:var(--w-body)}
+
+/* ── 순환 사이클 ── */
+.cyc{display:grid;grid-template-columns:1fr 40px 1fr;grid-template-rows:1fr 40px 1fr;gap:10px;flex:1;min-height:0}
+.cyc .nd{background:var(--soft);padding:14px 18px;display:flex;flex-direction:column;justify-content:center}
+.cyc .nd .st{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--accent)}
+.cyc .nd .nt{font-size:16px;line-height:23px;font-weight:var(--w-head);color:var(--primary);margin-top:2px}
+.cyc .nd .nx{font-size:13.5px;line-height:20px;color:var(--ink);margin-top:4px}
+.cyc .nd.on{background:var(--panel)}
+.cyc .nd.on .st{color:var(--on-primary-sub)}
+.cyc .nd.on .nt,.cyc .nd.on .nx{color:var(--on-primary)}
+.cyc .ar{display:flex;align-items:center;justify-content:center}
+.cyc .mid{display:flex;align-items:center;justify-content:center}
+
+/* ── 기둥과 토대 ── */
+.plr{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.plr .roof{background:var(--panel);color:var(--on-primary);padding:11px 18px;font-size:16px;line-height:23px;font-weight:var(--w-head);text-align:center;flex:0 0 auto}
+.plr .ps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:1;min-height:0}
+.plr .ps.c4{grid-template-columns:repeat(4,1fr)}
+.plr .p{background:var(--soft);padding:16px 18px;display:flex;flex-direction:column}
+.plr .p .pn{font-size:13px;line-height:18px;font-weight:var(--w-label);color:var(--accent)}
+.plr .p .pt{font-size:16px;line-height:23px;font-weight:var(--w-head);color:var(--primary);margin:2px 0 10px 0}
+.plr .base{background:var(--bar);padding:10px 18px;font-size:14.5px;line-height:21px;color:var(--primary);flex:0 0 auto;display:flex;gap:14px}
+.plr .base b{flex:0 0 auto}
+
+/* ── 히트맵 표 ── */
+table.t td.h0{background:none;text-align:center;color:var(--muted)}
+table.t td.h1{background:var(--soft);text-align:center;color:var(--primary)}
+table.t td.h2{background:var(--bar);text-align:center;color:var(--primary);font-weight:var(--w-head)}
+table.t td.h3{background:var(--accent);text-align:center;color:var(--on-primary);font-weight:var(--w-head)}
+table.t.heat td{border-bottom:2px solid var(--slide-bg)}
+table.t.heat td.ax{border-bottom:1px solid var(--rule)}
+.legend i.h1{background:var(--soft)}.legend i.h2{background:var(--bar)}.legend i.h3{background:var(--accent)}
+
+/* ── 간트 차트 ── */
+table.t.gantt{table-layout:fixed;font-size:13px;line-height:18px}
+table.t.gantt th{font-size:13px;text-align:center;padding-left:2px;padding-right:2px;border-left:1px solid var(--hair)}
+table.t.gantt th:first-child{text-align:left;border-left:0}
+table.t.gantt td{padding:7px 8px;border-left:1px solid var(--hair);border-bottom:5px solid var(--slide-bg);border-top:5px solid var(--slide-bg);height:42px}
+table.t.gantt td:first-child{border-left:0;font-size:14.5px}
+table.t.gantt td.g{background:var(--bar);color:var(--primary);font-weight:var(--w-head)}
+table.t.gantt td.g.on{background:var(--accent);color:var(--on-primary)}
+table.t.gantt td.ms{text-align:center;color:var(--primary);font-weight:var(--w-head)}
+
+/* ── 조직도 ── */
+.oc{display:flex;flex-direction:column;align-items:stretch;flex:1;min-height:0;justify-content:center}
+.oc .topb{align-self:center;background:var(--panel);color:var(--on-primary);padding:12px 26px;text-align:center;min-width:240px}
+.oc .topb .on1{font-size:16px;line-height:22px;font-weight:var(--w-head)}
+.oc .topb .on2{font-size:12.5px;line-height:18px;color:var(--on-primary-sub)}
+.oc .stem{align-self:center;width:0;height:18px;border-left:1.5px solid var(--primary)}
+.oc .bar4{height:0;border-top:1.5px solid var(--primary);margin:0 calc((100% - 60px) / 8)}
+.oc .bar3{height:0;border-top:1.5px solid var(--primary);margin:0 calc((100% - 40px) / 6)}
+.oc .row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.oc .row.c3{grid-template-columns:repeat(3,1fr)}
+.oc .u{display:flex;flex-direction:column}
+.oc .u .stem{height:14px}
+.oc .ub{background:var(--soft);padding:10px 14px;text-align:center}
+.oc .ub .un1{font-size:15px;line-height:21px;font-weight:var(--w-head);color:var(--primary)}
+.oc .ub .un2{font-size:12.5px;line-height:18px;color:var(--muted)}
+.oc .u ul{margin-top:10px}
+
+/* ── 번호 붙인 실행 과제, 고객의 말 ── */
+table.t td.no{font-size:30px;line-height:36px;font-weight:var(--w-num);color:var(--accent);width:64px}
+.quote{display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;border-left:4px solid var(--accent);padding:6px 0 6px 28px}
+.quote .qt{font-size:24px;line-height:38px;font-weight:var(--w-label);color:var(--primary)}
+.quote .qa{display:flex;align-items:center;gap:14px;margin-top:22px;font-size:14px;line-height:21px;color:var(--ink)}
+.quote .qa b{font-size:15px}
+.quote .qa img{height:22px;width:auto;display:block}
+.cols.accent3>div:last-child .colh{border-bottom-color:var(--accent);color:var(--accent)}
+.stepno{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--accent);margin-bottom:4px}
+
+/* ── 화면 여러 장과 설명 (제품 화면을 번호로 짚어 설명할 때) ── */
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.shots.s3{grid-template-columns:1fr 1fr 1fr}
+.shots .sh{display:flex;flex-direction:column;align-items:center;min-height:0}
+.shots .sh .im{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start}
+.shots .sh img{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
+.shots .cap{margin-top:10px;font-size:13.5px;line-height:19px;color:var(--ink);text-align:center}
+.shots .cap b{color:var(--accent)}
+
+/* ── 두 대상을 같은 행으로 비교 (행 이름 | 대상 A | 대상 B). 그림과 큰 수치를 칸에 넣을 수 있다 ── */
+.cmp{display:grid;grid-template-columns:200px 1fr 1fr;column-gap:30px;flex:1;min-height:0;align-content:center}
+.cmp>div{padding:10px 0;border-bottom:1px solid var(--rule);display:flex;align-items:center;font-size:15px;line-height:22px;color:var(--ink)}
+.cmp>.ax{font-weight:var(--w-head);color:var(--primary)}
+.cmp>.hd{border-bottom:1.5px solid var(--primary);padding:0 0 8px 0;font-size:18px;font-weight:var(--w-head);color:var(--primary)}
+.cmp>.hd img{height:28px;width:auto;display:block}
+.cmp>.pic img{height:170px;width:auto;display:block}
+.cmp>.st{flex-direction:column;align-items:flex-start;justify-content:center}
+.cmp .big{font-size:30px;line-height:38px;font-weight:var(--w-num);color:var(--primary)}
+.cmp .big.acc{color:var(--accent)}
+.cmp .sm{font-size:12.5px;line-height:17px;color:var(--muted)}
+.cmp>.end{border-bottom:0}
+
+/* ── 표지 변형: 큰 로고가 오른쪽 아래로 잘려 나가는 표지 (cover hero) ── */
+.cover.hero .cv-hero{position:absolute;right:-90px;bottom:-70px;height:620px;width:auto;display:block}
+.cover.hero .cv-title{top:230px;font-size:56px;line-height:68px;right:560px}
+.cover.hero .cv-rule{top:330px}
+.cover.hero .cv-sub{top:356px;font-size:20px;line-height:30px;right:560px}
+
+/* ============================================================
+   데이터 도표 추가분 (p48~p57)
+   도트 매트릭스, 비례 원, 소형 도표 나열, KPI 대시보드는 vendor/consulting-pptx-skill의 부품 15·22, 추가 부품 P.4·P.9,
+   성장률 표시 막대는 vendor/mckinsey-pptx의 column_split_growth를 참고했다. 메코, 덤벨, 증감 막대, 목표 대비, 코호트 표는 새로 짰다.
+   L6(강조색 도형 3개 이하)을 넘지 않도록 계열 전체를 칠하는 자리에는 --accent 대신 --primary를 쓴다.
+   ============================================================ */
+
+/* ── 도트 매트릭스: 점 100개, 앞에서부터 on ── */
+.dm{display:flex;align-items:center;gap:40px;flex:1;min-height:0;padding:12px 0 8px 0}
+.dm-v{flex:0 0 150px}
+.dm-v .v{font-size:52px;line-height:62px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.02em}
+.dm-v .ds{font-size:14px;line-height:20px;color:var(--ink);margin-top:6px}
+.dm-g{display:grid;grid-template-columns:repeat(10,26px);gap:10px}
+.dm-g i{display:block;width:26px;height:26px;border-radius:50%;background:var(--bar)}
+.dm-g i.on{background:var(--primary)}
+
+/* ── 시장 규모 원: 바닥을 맞춘 원 세 개 ── */
+.pc{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:12px}
+.pc .box{position:relative;width:340px;height:340px}
+.pc .o{position:absolute;left:50%;bottom:0;border-radius:50%}
+.pc .c1{width:340px;height:340px;margin-left:-170px;background:var(--soft)}
+.pc .c2{width:220px;height:220px;margin-left:-110px;background:var(--bar)}
+.pc .c3{width:110px;height:110px;margin-left:-55px;background:var(--accent)}
+.pc .lb{position:absolute;left:60px;right:60px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.pc .lb .n{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--ink)}
+.pc .lb .v{font-size:18px;line-height:24px;font-weight:var(--w-num);color:var(--primary)}
+.pc .l1{top:30px}
+.pc .l2{top:150px}
+.pc .l3{top:265px}
+.pc .l3 .n,.pc .l3 .v{color:var(--on-primary)}
+
+/* ── 성장률 표시 세로 막대: colchart 위에 구간 괄호 ── */
+.colchart .cagr{display:grid;column-gap:28px;padding:0 20px 12px 20px;flex:0 0 auto}
+.colchart .cagr>div{display:flex;flex-direction:column;align-items:center}
+.colchart .cagr span{font-size:13px;line-height:18px;color:var(--ink);margin-bottom:5px;white-space:nowrap}
+.colchart .cagr span b{color:var(--accent)}
+.colchart .cagr i{display:block;align-self:stretch;height:8px;border:1.5px solid var(--muted);border-bottom:0}
+.legend i.fc{background:var(--soft);border:1px dashed var(--accent)}
+
+/* ── 소형 도표 나열: 같은 축의 작은 세로 막대 세 개 ── */
+.smx{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;flex:1;min-height:0;padding-top:4px}
+.smx .pn{display:flex;flex-direction:column;min-height:0}
+.smx .pt{font-size:16px;line-height:22px;font-weight:var(--w-head);color:var(--primary);margin-bottom:6px}
+.smx .colchart .plot{gap:14px;padding:0 8px;min-height:120px}
+.smx .colchart .xs{gap:14px;padding:6px 8px 0 8px}
+.smx .colchart .cb{max-width:60px}
+.smx .rd{font-size:14.5px;line-height:22px;color:var(--ink);margin-top:12px;padding-top:10px;border-top:1px solid var(--hair);min-height:56px}
+
+/* ── KPI 대시보드: 괘선으로 나눈 3열 2행 ── */
+.kd{display:grid;grid-template-columns:repeat(3,1fr);flex:0 0 auto}
+.kd .kt{padding:18px 26px 20px 26px;border-left:1px solid var(--rule);border-top:1px solid var(--rule);display:flex;flex-direction:column}
+.kd .kt:nth-child(3n+1){padding-left:0;border-left:0}
+.kd .kt:nth-child(-n+3){border-top:0;padding-top:4px}
+.kd .lb{font-size:14px;line-height:19px;font-weight:var(--w-label);color:var(--muted)}
+.kd .vr{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:4px}
+.kd .v{font-size:40px;line-height:50px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.02em}
+.kd .sp{display:flex;align-items:flex-end;gap:4px;height:40px;margin-bottom:8px;flex:0 0 auto}
+.kd .sp i{display:block;width:9px;background:var(--bar)}
+.kd .sp i.on{background:var(--primary)}
+.kd .dl{font-size:14px;line-height:20px;font-weight:var(--w-head);color:var(--ink);margin-top:4px}
+.kd .dl.up{color:var(--accent)}
+.kd .dl.dn{color:var(--neg)}
+.kd .ds{font-size:12.5px;line-height:18px;color:var(--muted);margin-top:2px}
+
+/* ── 메코 차트: 열 너비는 flex, 조각 높이는 % ── */
+.mk{display:flex;gap:4px;flex:1;min-height:0;padding-top:10px}
+.mk .mc{display:flex;flex-direction:column;min-width:0}
+.mk .tv{font-size:13px;line-height:18px;font-weight:var(--w-head);color:var(--primary);text-align:center;margin-bottom:4px}
+.mk .segs{flex:1;min-height:150px;display:flex;flex-direction:column;border-bottom:1.5px solid var(--primary)}
+.mk .sg{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:var(--w-head);color:var(--primary);background:var(--bar);border-top:2px solid var(--slide-bg)}
+.mk .sg:first-child{border-top:0}
+.mk .sg.a{background:var(--primary);color:var(--on-primary)}
+.mk .sg.c{background:var(--bar)}
+.mk .sg.d{background:var(--soft)}
+.mk .sg.on{background:var(--accent);color:var(--on-primary)}
+.mk .nm{font-size:12.5px;line-height:17px;color:var(--muted);text-align:center;margin-top:7px;height:34px}
+
+/* ── 전후 비교 덤벨: 점의 left, 선의 left와 width를 % ── */
+.db{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.db .row{display:grid;grid-template-columns:150px 1fr 80px;align-items:center;gap:18px;height:60px;border-bottom:1px solid var(--hair)}
+.db .nm{font-size:15px;line-height:20px;color:var(--ink)}
+.db .trk{position:relative;height:100%}
+.db .ln{position:absolute;top:50%;height:3px;margin-top:-1px;background:var(--bar)}
+.db .d{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--bar)}
+.db .d.b{background:var(--primary)}
+.db .d span{position:absolute;bottom:17px;left:-33px;width:80px;text-align:center;font-size:12.5px;line-height:16px;font-weight:var(--w-head);color:var(--muted);white-space:nowrap}
+.db .d.a span{bottom:auto;top:17px}  /* 앞 시점 값은 점 아래, 뒤 시점 값은 점 위: 두 점이 가까워도 겹치지 않는다 */
+.db .d.b span{color:var(--primary)}
+.db .val{font-size:15px;font-weight:var(--w-head);color:var(--primary);text-align:right}
+.db .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.db .row.on .d.b{background:var(--accent)}
+.db .row.on .d.b span,.db .row.on .val{color:var(--accent)}
+.db .row.ax{height:26px;border-bottom:0;align-items:flex-start;padding-top:6px}
+.db .tk{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+
+/* ── 증감 가로 막대: 가운데 0선에서 좌우로 ── */
+.dv{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.dv .row{display:grid;grid-template-columns:150px 1fr 1fr;align-items:stretch;height:44px;border-bottom:1px solid var(--hair)}
+.dv .row:last-child{border-bottom:0}
+.dv .nm{font-size:15px;line-height:20px;color:var(--ink);display:flex;align-items:center;padding-right:14px}
+.dv .l,.dv .r{display:flex;align-items:center;gap:8px}
+.dv .l{justify-content:flex-end}
+.dv .r{border-left:1.5px solid var(--primary)}
+.dv .bar{height:20px;background:var(--bar)}
+.dv span{font-size:14px;font-weight:var(--w-head);color:var(--primary);white-space:nowrap}
+.dv .l span{color:var(--neg)}
+.dv .row.hd{height:26px;border-bottom:0}
+.dv .row.hd span{font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.dv .row.hd .l{padding-right:10px}
+.dv .row.hd .r{padding-left:10px}
+.dv .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.dv .row.on .bar{background:var(--accent)}
+.dv .row.on span{color:var(--accent)}
+
+/* ── 목표 대비 달성: 실적 막대와 목표선 ── */
+.tg{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:center}
+.tg .row{display:grid;grid-template-columns:140px 1fr 120px 76px;align-items:center;gap:14px;height:52px;border-bottom:1px solid var(--hair)}
+.tg .row:last-child{border-bottom:0}
+.tg .nm{font-size:15px;line-height:20px;color:var(--ink)}
+.tg .trk{position:relative;height:24px;background:var(--hair)}
+.tg .bar{height:100%;background:var(--bar)}
+.tg .tm{position:absolute;top:-6px;bottom:-6px;width:3px;margin-left:-1px;background:var(--primary)}
+.tg .val{font-size:14.5px;font-weight:var(--w-head);color:var(--primary);text-align:right;white-space:nowrap}
+.tg .val span{font-weight:var(--w-body);color:var(--muted)}
+.tg .rt{font-size:15px;font-weight:var(--w-head);color:var(--primary);text-align:right}
+.tg .rt.dn{color:var(--neg)}
+.tg .row.hd{height:24px}
+.tg .row.hd span{font-size:12px;font-weight:var(--w-label);color:var(--muted)}
+.tg .row.on .nm{font-weight:var(--w-head);color:var(--primary)}
+.tg .row.on .bar{background:var(--accent)}
+.tg .row.on .rt{color:var(--accent)}
+.legend i.tm{width:3px;height:14px;background:var(--primary)}
+
+/* ── 코호트 리텐션 표: 히트맵 표에서 가장 짙은 단계를 --primary로 ── */
+table.t.cohort td.h3{background:var(--primary)}
+table.t.cohort td.na{background:none}
+table.t.cohort th{font-size:13px}
+table.t.cohort td{height:46px}
+
+/* ============================================================
+   PowerPoint 기본 차트 (p58~p61): 원형, 도넛, 꺾은선, 영역
+   design/nchart.js가 data-chart의 수치로 SVG 미리보기를 그리고, engine/html_to_pptx.py가 같은 자리에 기본 차트를 넣는다.
+   PowerPoint에서 차트를 선택하고 '데이터 편집'으로 수치를 고칠 수 있다. 이 SVG만 S35의 예외다.
+   ============================================================ */
+.nchart{position:relative;flex:1;min-height:220px}
+.nchart svg.nc{position:absolute;left:0;top:0;display:block;overflow:visible}
+.nchart svg text{font-family:var(--font)}
+.nchart .nc-ctr{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.nchart .nc-ctr .v{font-size:30px;line-height:36px;font-weight:var(--w-num);color:var(--primary);letter-spacing:-.01em}
+.nchart .nc-ctr .lb{font-size:12.5px;line-height:17px;font-weight:var(--w-label);color:var(--muted)}
+/*deck.css:end*/
+:root{--brand:#D9415F;--brand-soft:#FBE9ED;}
+</style></head><body>
+<main class="deck" data-theme="rose" data-type="investor">
+<!-- p01 표지 -->
+<section data-part="p01" data-type="cover" class="slide cover">
+  <div class="cv-l"></div>
+  <div class="cv-brand">Hankki Lab</div>
+  <div class="cv-title">도표 부품 시연</div>
+  <div class="cv-rule"></div>
+  <div class="cv-sub">새로 더한 도표 14종을 예시 데이터로 채운 견본</div>
+  <div class="cv-meta">2026년 10월<br>내부 검토용, 수치는 모두 가상</div>
+</section>
+<!-- p48 도트 매트릭스 -->
+<section data-part="p48" data-type="dot_matrix" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">도트 매트릭스 p48</span></div>
+  <h1 class="title">뷰티 소비자의 68%가<br>구매 전에 리뷰 영상을 확인</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>구매 전 리뷰 영상 시청 여부</span><span class="u">%, 2026년 9월 설문 (n=1,200)</span></div>
+        <div class="dm">
+          <div class="dm-v"><div class="v">68%</div><div class="ds">응답자 100명 가운데 68명이 구매 전에 리뷰 영상을 본다</div></div>
+          <div class="dm-g"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="legend"><span><i class="a"></i>본다</span><span><i class="c"></i>보지 않는다</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>리뷰 영상은 구매 직전 단계의 기본 확인 절차다</li>
+            <li>20대는 81%로 평균보다 13%p 높다</li>
+            <li>보지 않는 32%는 대부분 재구매 고객이다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">1</span></div>
+</section>
+<!-- p49 시장 규모 원 (비례 원) -->
+<section data-part="p49" data-type="market_circles" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">시장 규모 원 p49</span></div>
+  <h1 class="title">브랜드 리뷰 콘텐츠 시장 2.4조 원 가운데<br>3년 안에 확보할 시장은 96억 원</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols eq">
+      <div>
+        <div class="axh"><span>국내 브랜드 리뷰 콘텐츠 시장</span><span class="u">원, 2026년</span></div>
+        <div class="pc">
+          <div class="box">
+            <div class="o c1"></div><div class="o c2"></div><div class="o c3"></div>
+            <div class="lb l1"><span class="n">전체 시장</span><span class="v">2.4조</span></div>
+            <div class="lb l2"><span class="n">접근 가능한 시장</span><span class="v">3,200억</span></div>
+            <div class="lb l3"><span class="n">확보할 시장</span><span class="v">96억</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">산정 근거</div>
+        <div class="fill">
+          <table class="t">
+            <tr><th style="width:130px">구분</th><th style="width:110px" class="num">규모</th><th>산정 방식</th></tr>
+            <tr><td class="ax">전체 시장</td><td class="num">2.4조</td><td>뷰티 브랜드 광고비 중 콘텐츠 비중</td></tr>
+            <tr><td class="ax">접근 가능한 시장</td><td class="num">3,200억</td><td>중소 브랜드 1.6만 곳 × 연 2,000만 원</td></tr>
+            <tr><td class="ax">확보할 시장</td><td class="num"><b class="acc">96억</b></td><td>접근 가능한 시장의 3%</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님. 원의 크기는 축척이 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">2</span></div>
+</section>
+<!-- p50 성장률 표시 세로 막대 -->
+<section data-part="p50" data-type="cagr_column" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">성장률 표시 세로 막대 p50</span></div>
+  <h1 class="title">연 매출은 3년간 연평균 59% 성장,<br>2027년 105억 원 전망</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>연 매출</span><span class="u">억 원, 2022~2027년 (2026년부터 전망)</span></div>
+        <div class="colchart">
+          <div class="cagr" style="grid-template-columns:repeat(6,1fr)">
+            <div style="grid-column:1/5"><span>2022~2025년 연평균 <b>59%</b></span><i></i></div>
+            <div style="grid-column:5/7"><span>2025~2027년 연평균 <b>48%</b></span><i></i></div>
+          </div>
+          <div class="plot">
+            <div class="col"><div class="cv">12</div><div class="cb" style="height:10%"></div></div>
+            <div class="col"><div class="cv">19</div><div class="cb" style="height:16%"></div></div>
+            <div class="col"><div class="cv">31</div><div class="cb" style="height:26%"></div></div>
+            <div class="col on"><div class="cv">48</div><div class="cb" style="height:40%"></div></div>
+            <div class="col fc"><div class="cv">72</div><div class="cb" style="height:60%"></div></div>
+            <div class="col fc"><div class="cv">105</div><div class="cb" style="height:88%"></div></div>
+          </div>
+          <div class="xs"><div>2022</div><div>2023</div><div>2024</div><div>2025</div><div>2026E</div><div>2027E</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="c"></i>실적</span><span><i class="fc"></i>전망</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>2025년 매출 48억 원은 3년 전인 2022년의 4배다</li>
+            <li>전망 구간의 성장률 48%는 실적 구간보다 낮게 잡았다</li>
+            <li>2027년 105억 원은 계약 갱신율 85%를 가정했다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">3</span></div>
+</section>
+<!-- p51 소형 도표 나열 -->
+<section data-part="p51" data-type="small_multiples" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">소형 도표 나열 p51</span></div>
+  <h1 class="title">인스타그램 유입은 4분기 만에 2.6배 증가,<br>유튜브와 검색은 제자리</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="axh"><span>채널별 분기 신규 고객</span><span class="u">천 명, 2025년 4분기~2026년 3분기 (세 도표의 축 범위가 같다)</span></div>
+    <div class="smx">
+      <div class="pn">
+        <div class="pt">인스타그램</div>
+        <div class="colchart">
+          <div class="plot">
+                <div class="col"><div class="cv">12</div><div class="cb" style="height:27%"></div></div>
+                <div class="col"><div class="cv">17</div><div class="cb" style="height:38%"></div></div>
+                <div class="col"><div class="cv">23</div><div class="cb" style="height:52%"></div></div>
+                <div class="col on"><div class="cv">31</div><div class="cb" style="height:70%"></div></div>
+          </div>
+          <div class="xs"><div>25.4Q</div><div>26.1Q</div><div>26.2Q</div><div>26.3Q</div></div>
+        </div>
+        <div class="rd">12천 명에서 31천 명으로 2.6배 늘었다</div>
+      </div>
+      <div class="pn">
+        <div class="pt">유튜브</div>
+        <div class="colchart">
+          <div class="plot">
+                <div class="col"><div class="cv">10</div><div class="cb" style="height:23%"></div></div>
+                <div class="col"><div class="cv">12</div><div class="cb" style="height:27%"></div></div>
+                <div class="col"><div class="cv">13</div><div class="cb" style="height:29%"></div></div>
+                <div class="col"><div class="cv">15</div><div class="cb" style="height:34%"></div></div>
+          </div>
+          <div class="xs"><div>25.4Q</div><div>26.1Q</div><div>26.2Q</div><div>26.3Q</div></div>
+        </div>
+        <div class="rd">1.5배 늘었지만 증가 폭이 줄고 있다</div>
+      </div>
+      <div class="pn">
+        <div class="pt">검색</div>
+        <div class="colchart">
+          <div class="plot">
+                <div class="col"><div class="cv">5</div><div class="cb" style="height:11%"></div></div>
+                <div class="col"><div class="cv">6</div><div class="cb" style="height:14%"></div></div>
+                <div class="col"><div class="cv">6</div><div class="cb" style="height:14%"></div></div>
+                <div class="col"><div class="cv">7</div><div class="cb" style="height:16%"></div></div>
+          </div>
+          <div class="xs"><div>25.4Q</div><div>26.1Q</div><div>26.2Q</div><div>26.3Q</div></div>
+        </div>
+        <div class="rd">분기마다 5~7천 명으로 거의 같다</div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">4</span></div>
+</section>
+<!-- p52 KPI 대시보드 -->
+<section data-part="p52" data-type="kpi_dashboard" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">KPI 대시보드 p52</span></div>
+  <h1 class="title">9월 월 거래액 8.4억 원으로 18% 증가,<br>객단가만 5% 하락</h1>
+  <div class="hr"></div>
+  <div class="body mid">
+    <div class="kd">
+      <div class="kt"><div class="lb">월 거래액</div><div class="vr"><div class="v">8.4억</div><div class="sp"><i style="height:40%"></i><i style="height:52%"></i><i style="height:61%"></i><i style="height:75%"></i><i class="on" style="height:92%"></i></div></div><div class="dl up">전월 대비 +18%</div><div class="ds">2026년 9월, 결제 완료 기준</div></div>
+      <div class="kt"><div class="lb">활성 브랜드사</div><div class="vr"><div class="v">214곳</div><div class="sp"><i style="height:55%"></i><i style="height:60%"></i><i style="height:58%"></i><i style="height:66%"></i><i class="on" style="height:71%"></i></div></div><div class="dl up">전월 대비 +12곳</div><div class="ds">월 1회 이상 캠페인 집행</div></div>
+      <div class="kt"><div class="lb">평균 객단가</div><div class="vr"><div class="v">38만</div><div class="sp"><i style="height:80%"></i><i style="height:74%"></i><i style="height:70%"></i><i style="height:63%"></i><i class="on" style="height:58%"></i></div></div><div class="dl dn">전월 대비 −5%</div><div class="ds">캠페인 1건당 결제액, 원</div></div>
+      <div class="kt"><div class="lb">월 콘텐츠 생산</div><div class="vr"><div class="v">1.2만</div><div class="sp"><i style="height:20%"></i><i style="height:34%"></i><i style="height:47%"></i><i style="height:66%"></i><i class="on" style="height:88%"></i></div></div><div class="dl up">전월 대비 +22%</div><div class="ds">검수를 통과한 리뷰 건수</div></div>
+      <div class="kt"><div class="lb">브랜드 재구매율</div><div class="vr"><div class="v">71%</div><div class="sp"><i style="height:62%"></i><i style="height:65%"></i><i style="height:64%"></i><i style="height:68%"></i><i class="on" style="height:70%"></i></div></div><div class="dl up">전월 대비 +3%p</div><div class="ds">90일 안에 다시 결제</div></div>
+      <div class="kt"><div class="lb">고객 획득 비용</div><div class="vr"><div class="v">4.2만</div><div class="sp"><i style="height:30%"></i><i style="height:38%"></i><i style="height:45%"></i><i style="height:52%"></i><i class="on" style="height:60%"></i></div></div><div class="dl up">전월 대비 −8%</div><div class="ds">브랜드사 1곳당, 원</div></div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">5</span></div>
+</section>
+<!-- p53 메코 차트 -->
+<section data-part="p53" data-type="marimekko" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">메코 차트 p53</span></div>
+  <h1 class="title">가장 큰 스킨케어 시장에서 자사 점유율 12%,<br>헤어와 바디는 아직 미진출</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>카테고리별 리뷰 콘텐츠 시장 점유</span><span class="u">너비는 시장 규모, 높이는 점유율 (100%)</span></div>
+        <div class="mk">
+          <div class="mc" style="flex:40"><div class="tv">1.1조</div><div class="segs"><div class="sg d" style="height:28%">28%</div><div class="sg c" style="height:26%">26%</div><div class="sg a" style="height:34%">34%</div><div class="sg on" style="height:12%">12%</div></div><div class="nm">스킨케어</div></div>
+          <div class="mc" style="flex:28"><div class="tv">7,700억</div><div class="segs"><div class="sg d" style="height:30%">30%</div><div class="sg c" style="height:28%">28%</div><div class="sg a" style="height:34%">34%</div><div class="sg on" style="height:8%">8%</div></div><div class="nm">색조</div></div>
+          <div class="mc" style="flex:20"><div class="tv">5,500억</div><div class="segs"><div class="sg d" style="height:30%">30%</div><div class="sg c" style="height:32%">32%</div><div class="sg a" style="height:38%">38%</div></div><div class="nm">헤어</div></div>
+          <div class="mc" style="flex:12"><div class="tv">3,300억</div><div class="segs"><div class="sg d" style="height:40%">40%</div><div class="sg c" style="height:35%">35%</div><div class="sg a" style="height:25%">25%</div></div><div class="nm">바디</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="b"></i>자사</span><span><i class="a"></i>경쟁사 A</span><span><i class="c"></i>경쟁사 B</span><span><i class="d"></i>기타</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>스킨케어 1.1조 원 시장에서 12%를 차지한다</li>
+            <li>색조 시장은 경쟁사 A가 34%로 가장 크다</li>
+            <li>헤어와 바디는 2027년 진출을 검토한다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">6</span></div>
+</section>
+<!-- p54 전후 비교 덤벨 -->
+<section data-part="p54" data-type="dumbbell" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">전후 비교 덤벨 p54</span></div>
+  <h1 class="title">도입 3개월 뒤 A 브랜드의 리뷰 전환율은<br>1.8%에서 5.2%로 3.4%p 상승</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>브랜드별 리뷰 페이지 구매 전환율</span><span class="u">%, 도입 직전 3개월과 도입 뒤 3개월</span></div>
+        <div class="db">
+          <div class="row on"><div class="nm">A 브랜드</div><div class="trk"><div class="ln" style="left:30%;width:57%"></div><div class="d a" style="left:30%"><span>1.8%</span></div><div class="d b" style="left:87%"><span>5.2%</span></div></div><div class="val">+3.4%p</div></div>
+          <div class="row"><div class="nm">B 브랜드</div><div class="trk"><div class="ln" style="left:35%;width:32%"></div><div class="d a" style="left:35%"><span>2.1%</span></div><div class="d b" style="left:67%"><span>4.0%</span></div></div><div class="val">+1.9%p</div></div>
+          <div class="row"><div class="nm">C 브랜드</div><div class="trk"><div class="ln" style="left:43%;width:22%"></div><div class="d a" style="left:43%"><span>2.6%</span></div><div class="d b" style="left:65%"><span>3.9%</span></div></div><div class="val">+1.3%p</div></div>
+          <div class="row"><div class="nm">D 브랜드</div><div class="trk"><div class="ln" style="left:50%;width:13%"></div><div class="d a" style="left:50%"><span>3.0%</span></div><div class="d b" style="left:63%"><span>3.8%</span></div></div><div class="val">+0.8%p</div></div>
+          <div class="row"><div class="nm">E 브랜드</div><div class="trk"><div class="ln" style="left:55%;width:5%"></div><div class="d a" style="left:55%"><span>3.3%</span></div><div class="d b" style="left:60%"><span>3.6%</span></div></div><div class="val">+0.3%p</div></div>
+          <div class="row ax"><div></div><div class="tk"><span>0</span><span>3%</span><span>6%</span></div><div></div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="c"></i>도입 전</span><span><i class="a"></i>도입 후</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>다섯 곳 모두 전환율이 올랐다</li>
+            <li>도입 전 전환율이 낮았던 브랜드일수록 크게 올랐다</li>
+            <li>E 브랜드는 이미 3%를 넘어 상승 폭이 0.3%p다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">7</span></div>
+</section>
+<!-- p55 증감 가로 막대 -->
+<section data-part="p55" data-type="diverging_bar" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">증감 가로 막대 p55</span></div>
+  <h1 class="title">브랜드사 광고비는 인스타그램에서 4.2억 원 증가,<br>TV에서 3.0억 원 감소</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>채널별 광고비 증감 (고객 브랜드사 214곳 합계)</span><span class="u">억 원, 2026년 1~9월, 전년 같은 기간 대비</span></div>
+        <div class="dv">
+          <div class="row hd"><div></div><div class="l"><span>감소</span></div><div class="r"><span>증가</span></div></div>
+          <div class="row on"><div class="nm">인스타그램</div><div class="l"></div><div class="r"><div class="bar" style="width:78%"></div><span class="v">+4.2</span></div></div>
+          <div class="row"><div class="nm">유튜브</div><div class="l"></div><div class="r"><div class="bar" style="width:52%"></div><span class="v">+2.8</span></div></div>
+          <div class="row"><div class="nm">틱톡</div><div class="l"></div><div class="r"><div class="bar" style="width:30%"></div><span class="v">+1.6</span></div></div>
+          <div class="row"><div class="nm">블로그</div><div class="l"></div><div class="r"><div class="bar" style="width:9%"></div><span class="v">+0.5</span></div></div>
+          <div class="row"><div class="nm">검색 광고</div><div class="l"><span class="v">-1.4</span><div class="bar" style="width:26%"></div></div><div class="r"></div></div>
+          <div class="row"><div class="nm">TV</div><div class="l"><span class="v">-3.0</span><div class="bar" style="width:56%"></div></div><div class="r"></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>늘어난 돈은 짧은 영상 채널로 갔다</li>
+            <li>검색 광고와 TV에서 4.4억 원이 빠졌다</li>
+            <li>블로그는 0.5억 원으로 거의 그대로다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">8</span></div>
+</section>
+<!-- p56 목표 대비 달성 -->
+<section data-part="p56" data-type="target_bullet" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">목표 대비 달성 p56</span></div>
+  <h1 class="title">3분기 매출 목표를 서울은 115% 달성,<br>광주는 60%에 그침</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>지역별 3분기 매출</span><span class="u">억 원, 2026년 7~9월</span></div>
+        <div class="tg">
+          <div class="row hd"><div></div><div></div><div class="val"><span>실적 / 목표</span></div><div class="rt"><span>달성률</span></div></div>
+          <div class="row on"><div class="nm">서울</div><div class="trk"><div class="bar" style="width:92%"></div><div class="tm" style="left:80%"></div></div><div class="val">4.6 <span>/ 4.0</span></div><div class="rt">115%</div></div>
+          <div class="row"><div class="nm">경기</div><div class="trk"><div class="bar" style="width:62%"></div><div class="tm" style="left:60%"></div></div><div class="val">3.1 <span>/ 3.0</span></div><div class="rt">103%</div></div>
+          <div class="row"><div class="nm">부산</div><div class="trk"><div class="bar" style="width:36%"></div><div class="tm" style="left:40%"></div></div><div class="val">1.8 <span>/ 2.0</span></div><div class="rt">90%</div></div>
+          <div class="row"><div class="nm">대구</div><div class="trk"><div class="bar" style="width:22%"></div><div class="tm" style="left:30%"></div></div><div class="val">1.1 <span>/ 1.5</span></div><div class="rt dn">73%</div></div>
+          <div class="row"><div class="nm">광주</div><div class="trk"><div class="bar" style="width:12%"></div><div class="tm" style="left:20%"></div></div><div class="val">0.6 <span>/ 1.0</span></div><div class="rt dn">60%</div></div>
+        </div>
+        <div class="legend" style="margin-top:10px"><span><i class="c"></i>실적</span><span><i class="tm"></i>목표</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>서울과 경기는 목표를 넘겼다</li>
+            <li>부산, 대구, 광주는 목표에 못 미쳤다</li>
+            <li>광주는 영업 담당자가 8월에 바뀌었다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">9</span></div>
+</section>
+<!-- p57 코호트 리텐션 표 -->
+<section data-part="p57" data-type="cohort_table" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">코호트 리텐션 표 p57</span></div>
+  <h1 class="title">가입 다음 달 잔존율은 6개월 내내 88~91%,<br>6개월 뒤에도 76% 유지</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>가입 시기별 브랜드사 잔존율</span><span class="u">%, 2026년 3~9월</span></div>
+        <table class="t heat cohort dense eq" style="margin-top:6px">
+          <tr><th style="width:96px">가입 시기</th><th style="width:84px" class="num">인원</th><th class="ctr">1개월</th><th class="ctr">2개월</th><th class="ctr">3개월</th><th class="ctr">4개월</th><th class="ctr">5개월</th><th class="ctr">6개월</th></tr>
+            <tr><td class="ax">2026.03</td><td class="num">42곳</td><td class="h3">90%</td><td class="h2">86%</td><td class="h2">83%</td><td class="h2">80%</td><td class="h1">78%</td><td class="h1">76%</td></tr>
+            <tr><td class="ax">2026.04</td><td class="num">51곳</td><td class="h3">89%</td><td class="h2">85%</td><td class="h2">81%</td><td class="h1">79%</td><td class="h1">77%</td><td class="na">-</td></tr>
+            <tr><td class="ax">2026.05</td><td class="num">48곳</td><td class="h3">91%</td><td class="h2">87%</td><td class="h2">84%</td><td class="h2">82%</td><td class="na">-</td><td class="na">-</td></tr>
+            <tr><td class="ax">2026.06</td><td class="num">55곳</td><td class="h3">88%</td><td class="h2">84%</td><td class="h2">80%</td><td class="na">-</td><td class="na">-</td><td class="na">-</td></tr>
+            <tr><td class="ax">2026.07</td><td class="num">63곳</td><td class="h3">90%</td><td class="h2">86%</td><td class="na">-</td><td class="na">-</td><td class="na">-</td><td class="na">-</td></tr>
+            <tr><td class="ax">2026.08</td><td class="num">70곳</td><td class="h3">89%</td><td class="na">-</td><td class="na">-</td><td class="na">-</td><td class="na">-</td><td class="na">-</td></tr>
+        </table>
+        <div class="legend" style="margin-top:12px"><span><i class="h1"></i>80% 미만</span><span><i class="h2"></i>80~87%</span><span><i class="a"></i>88% 이상</span></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>첫 달 잔존율이 88~91%로 가입 시기와 관계없이 고르다</li>
+            <li>매달 2~4%p씩 줄어 6개월 뒤 76%가 남는다</li>
+            <li>가장 큰 이탈은 2개월째에 일어난다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">10</span></div>
+</section>
+<!-- p58 도넛 (기본 차트) -->
+<section data-part="p58" data-type="doughnut" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">도넛 (기본 차트) p58</span></div>
+  <h1 class="title">광고 상품 52%와 구독 26%,<br>두 상품이 매출의 78% 차지</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>상품별 매출 구성비</span><span class="u">%, 2026년 1~9월</span></div>
+        <div class="nchart" data-chart='{"type": "doughnut", "categories": ["광고 상품", "구독", "데이터 리포트", "기타"], "series": [{"name": "매출 구성비", "values": [52, 26, 15, 7]}], "unit": "%", "highlight": 0}'><div class="nc-ctr"><div class="lb">누적 매출</div><div class="v">42억</div></div></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>광고 상품과 구독을 합하면 매출의 78%다</li>
+            <li>구독 매출은 매달 같은 금액으로 들어온다</li>
+            <li>데이터 리포트는 3월에 출시해 아직 15%다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">11</span></div>
+</section>
+<!-- p59 원형 (기본 차트) -->
+<section data-part="p59" data-type="pie" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">원형 (기본 차트) p59</span></div>
+  <h1 class="title">신규 브랜드사의 46%가 인스타그램으로 유입</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>신규 브랜드사 유입 경로</span><span class="u">%, 2026년 1~9월 가입 312곳</span></div>
+        <div class="nchart" data-chart='{"type": "pie", "categories": ["인스타그램", "유튜브", "검색", "기타"], "series": [{"name": "유입 경로", "values": [46, 28, 17, 9]}], "unit": "%", "highlight": 0}'></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>인스타그램 한 경로가 유튜브와 검색을 합한 45%보다 많다</li>
+            <li>유튜브 유입은 28%로 두 번째다</li>
+            <li>검색 유입은 17%로 광고를 줄인 뒤 낮아졌다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">12</span></div>
+</section>
+<!-- p60 꺾은선 (기본 차트) -->
+<section data-part="p60" data-type="line" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">꺾은선 (기본 차트) p60</span></div>
+  <h1 class="title">자사 월 거래액은 6개월 만에 5.2배 증가,<br>업계 평균은 2.2배</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>월 거래액</span><span class="u">억 원, 2026년 1~6월</span></div>
+        <div class="nchart" data-chart='{"type": "line", "categories": ["1월", "2월", "3월", "4월", "5월", "6월"], "series": [{"name": "자사", "values": [1.2, 1.8, 2.6, 3.5, 4.7, 6.2]}, {"name": "업계 평균", "values": [1.0, 1.2, 1.5, 1.7, 2.0, 2.2]}], "decimals": 1, "highlight": 0}'></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>1월 1.2억 원에서 6월 6.2억 원으로 5.2배 늘었다</li>
+            <li>업계 평균은 1.0억 원에서 2.2억 원으로 2.2배 늘었다</li>
+            <li>격차는 4월부터 크게 벌어졌다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">13</span></div>
+</section>
+<!-- p61 누적 영역 (기본 차트) -->
+<section data-part="p61" data-type="area" class="slide">
+  <div class="top"><span class="brand">Hankki Lab</span><span class="kicker">누적 영역 (기본 차트) p61</span></div>
+  <h1 class="title">월 리뷰 콘텐츠는 6개월 만에 3.2배,<br>색조가 4.4배로 가장 빠르게 증가</h1>
+  <div class="hr"></div>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <div class="axh"><span>카테고리별 월 리뷰 콘텐츠</span><span class="u">천 건, 2026년 4~9월</span></div>
+        <div class="nchart" data-chart='{"type": "area", "categories": ["4월", "5월", "6월", "7월", "8월", "9월"], "series": [{"name": "스킨케어", "values": [20, 24, 30, 38, 46, 55]}, {"name": "색조", "values": [10, 14, 20, 28, 36, 44]}, {"name": "헤어", "values": [6, 8, 10, 12, 15, 18]}], "highlight": 1}'></div>
+      </div>
+      <div>
+        <div class="colh">이 도표가 말하는 것</div>
+        <div class="fill">
+          <ul class="bl">
+            <li>전체는 36천 건에서 117천 건으로 3.2배 늘었다</li>
+            <li>색조는 10천 건에서 44천 건으로 4.4배 늘었다</li>
+            <li>헤어는 18천 건으로 아직 작다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="src">출처: 예시 데이터, 실제 수치 아님</div>
+  <div class="foot"><span>Hankki Lab | 도표 부품 시연</span><span class="pg">14</span></div>
+</section>
+<!-- p24 뒤표지 -->
+<section data-part="p24" data-type="back_cover" class="slide back">
+  <div class="cv-l"></div>
+  <div class="bk-brand">Hankki Lab</div>
+  <div class="bk-rule"></div>
+  <div class="bk-meta">홍길동 대표<br>hello@example.com<br>example.com</div>
+</section>
+</main>
+<script>/*nchart.js:start*/
+/* ============================================================
+   nchart.js: PowerPoint 기본 차트로 바뀌는 도표의 HTML 미리보기
+   - <div class="nchart" data-chart='{...}'> 안에 SVG를 그린다. 원본은 data-chart의 수치이고 SVG는 매번 다시 그린다.
+   - 그린 뒤 플롯 영역, 범례, 색을 data-layout에 적는다. engine/html_to_pptx.py가 이 값으로 같은 자리에 기본 차트를 넣는다.
+     PowerPoint에서는 차트를 선택하고 '데이터 편집'으로 수치를 고칠 수 있다.
+   - data-chart 항목
+       type        "doughnut" | "pie" | "line" | "area"
+       categories  항목 이름 (원형·도넛은 조각, 꺾은선·영역은 가로축 시점)
+       series      [{"name": "계열 이름", "values": [수치, ...]}, ...]  원형·도넛은 계열 하나만 쓴다
+       highlight   강조색을 칠할 번호 (원형·도넛은 항목 번호, 꺾은선·영역은 계열 번호, 0부터). 없으면 강조하지 않는다
+       unit        수치 뒤에 붙일 단위 글자 (예: "%", "억")
+       decimals    소수 자릿수 (기본 0)
+       labels      꺾은선의 값 표시: "all" | "last" | "none" (기본: 계열이 하나면 all, 여럿이면 last)
+       stacked     영역을 누적할지 (기본 true)
+       max         세로축 최댓값 (기본: 자동)
+   - 변환 제약 때문에 부품에서 SVG를 쓰지 않는다는 규칙(S35)의 예외다. 이 SVG는 PPTX에서 그림이 아니라 기본 차트로 바뀐다.
+   ============================================================ */
+(function () {
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var ORDER = ["primary", "bar", "soft", "muted", "rule"]; // 강조하지 않는 조각과 계열의 색 순서
+
+  function hex(c) {
+    var m = (c || "").match(/rgba?\(([^)]+)\)/);
+    if (!m) return "#000000";
+    return "#" + m[1].split(/[ ,/]+/).slice(0, 3).map(function (v) { return Math.round(+v).toString(16).padStart(2, "0"); }).join("");
+  }
+  function tokens(el) {
+    var t = {};
+    ["primary", "accent", "ink", "muted", "rule", "hair", "soft", "bar", "slide-bg", "on-primary"].forEach(function (k) {
+      var p = document.createElement("i");
+      p.style.color = "var(--" + k + ")";
+      el.appendChild(p);
+      t[k] = hex(getComputedStyle(p).color);
+      p.remove();
+    });
+    return t;
+  }
+  function dark(h) { // 채움 위 글자를 흰색으로 둘지
+    var r = parseInt(h.substr(1, 2), 16), g = parseInt(h.substr(3, 2), 16), b = parseInt(h.substr(5, 2), 16);
+    return 0.299 * r + 0.587 * g + 0.114 * b < 150;
+  }
+  function colors(n, hi, T) {
+    var out = [], k = 0;
+    for (var i = 0; i < n; i++) out.push(i === hi ? T.accent : T[ORDER[k++ % ORDER.length]]);
+    return out;
+  }
+  function fmt(v, spec) {
+    var d = Math.min(6, Math.max(0, Math.floor(Number(spec.decimals) || 0)));
+    return Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }) + (spec.unit || "");
+  }
+  function niceMax(v) { // 눈금 네 칸이 깔끔한 수로 끊기도록 한 칸의 크기부터 정한다
+    if (v <= 0) return 4;
+    var u = (v * 1.06) / 4, p = Math.pow(10, Math.floor(Math.log10(u)));
+    var steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    for (var i = 0; i < steps.length; i++) if (steps[i] * p >= u) return 4 * steps[i] * p;
+    return 40 * p;
+  }
+  function el(tag, attrs, parent, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(svg, x, y, s, o) {
+    o = o || {};
+    return el("text", { x: x, y: y, "font-size": o.size || 12.5, "font-weight": o.weight || 400, fill: o.fill,
+      "text-anchor": o.anchor || "start", "dominant-baseline": "central" }, svg, s);
+  }
+  // 범례를 그리고 실제로 차지한 상자를 돌려준다. PowerPoint는 범례 상자 안에 항목을 고르게 흩어 놓으므로,
+  // 상자를 항목에 꼭 맞게 잡아야 미리보기와 같은 자리에 놓인다
+  function legend(svg, box, names, cols, T, vertical) {
+    var g = el("g", {}, svg), n = names.length, widths = [];
+    if (vertical === true) {
+      var step = 28, y0 = box.y + (box.h - step * n) / 2;
+      names.forEach(function (nm, i) {
+        var cy = y0 + i * step + step / 2;
+        el("rect", { x: box.x, y: cy - 5.5, width: 11, height: 11, fill: cols[i] }, g);
+        widths.push(txt(g, box.x + 18, cy, nm, { size: 13, fill: T.ink }).getComputedTextLength());
+      });
+      return { x: box.x - 4, y: y0, w: 18 + Math.max.apply(null, widths) + 16, h: step * n };
+    }
+    var x = 0, cy = box.y + box.h / 2, key = vertical === "line" ? 26 : 18;
+    names.forEach(function (nm, i) {
+      if (vertical === "line") { // 꺾은선 범례는 PowerPoint처럼 선과 점으로 그린다
+        el("line", { x1: x, x2: x + 20, y1: cy, y2: cy, stroke: cols[i], "stroke-width": 3 }, g);
+        el("circle", { cx: x + 10, cy: cy, r: 3.5, fill: cols[i] }, g);
+      } else el("rect", { x: x, y: cy - 5.5, width: 11, height: 11, fill: cols[i] }, g);
+      x += key + txt(g, x + key, cy, nm, { size: 12, fill: T.ink }).getComputedTextLength() + 22;
+    });
+    var w = x - 22, left = box.x + (box.w - w) / 2;
+    g.setAttribute("transform", "translate(" + left + " 0)");
+    return { x: left - 8 - 7 * n, y: box.y, w: w + 16 + 14 * n, h: box.h };
+  }
+
+  function round(spec, W, H, T, svg) {
+    var s = spec.series[0], vals = s.values.map(Number), cats = spec.categories;
+    var hole = spec.type === "doughnut" ? 0.6 : 0;
+    var cols = colors(vals.length, spec.highlight, T);
+    var sum = vals.reduce(function (a, b) { return a + b; }, 0) || 1;
+    var D, plot, leg = null;
+    if (hole) { // 도넛: 왼쪽에 원, 오른쪽에 범례
+      D = Math.min(H, W * 0.56);
+      plot = { x: 0, y: (H - D) / 2, w: D, h: D };
+      leg = { x: D + 36, y: plot.y, w: W - D - 36, h: D };
+    } else {     // 원형: 가운데에 원, 바깥에 항목 이름과 값
+      D = Math.min(H - 70, W - 260);
+      if (D < 80) throw new Error("원형을 그릴 자리가 좁다 (가로 340px, 세로 150px 이상 필요)");
+      plot = { x: (W - D) / 2, y: (H - D) / 2, w: D, h: D };
+    }
+    var cx = plot.x + D / 2, cy = plot.y + D / 2, R = D / 2, r = R * hole, a0 = -Math.PI / 2;
+    vals.forEach(function (v, i) {
+      var a1 = a0 + (v / sum) * Math.PI * 2, large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = function (rad, a) { return (cx + rad * Math.cos(a)).toFixed(2) + " " + (cy + rad * Math.sin(a)).toFixed(2); };
+      if (v / sum > 0.9999) { // 한 조각이 전체: 호의 시작과 끝이 같으면 SVG가 호를 생략하므로 원 두 개(도넛은 가운데를 뚫어)로 그린다
+        var ring = "M" + (cx - R) + " " + cy + " a" + R + " " + R + " 0 1 0 " + 2 * R + " 0 a" + R + " " + R + " 0 1 0 " + -2 * R + " 0 Z";
+        if (hole) ring += " M" + (cx - r) + " " + cy + " a" + r + " " + r + " 0 1 0 " + 2 * r + " 0 a" + r + " " + r + " 0 1 0 " + -2 * r + " 0 Z";
+        el("path", { d: ring, fill: cols[i], "fill-rule": "evenodd" }, svg);
+      } else if (v > 0) {
+        var d = "M" + p(R, a0) + " A" + R + " " + R + " 0 " + large + " 1 " + p(R, a1);
+        d += hole ? " L" + p(r, a1) + " A" + r + " " + r + " 0 " + large + " 0 " + p(r, a0) + " Z" : " L" + cx + " " + cy + " Z";
+        el("path", { d: d, fill: cols[i], stroke: T["slide-bg"], "stroke-width": 1.5 }, svg);
+      }
+      var mid = (a0 + a1) / 2;
+      if (v <= 0) { a0 = a1; return; } // 값이 0인 조각에는 라벨을 달지 않는다 (PPTX에서도 지운다)
+      if (hole) {
+        var lr = (R + r) / 2;
+        txt(svg, cx + lr * Math.cos(mid), cy + lr * Math.sin(mid), fmt(v, spec), { anchor: "middle", weight: 600, size: 13, fill: dark(cols[i]) ? T["on-primary"] : T.primary });
+      } else {
+        var lx = cx + (R + 16) * Math.cos(mid), ly = cy + (R + 16) * Math.sin(mid), an = Math.cos(mid) >= 0 ? "start" : "end";
+        if (Math.abs(Math.cos(mid)) < 0.2) an = "middle";
+        txt(svg, lx, ly - 9, cats[i], { anchor: an, size: 12.5, fill: T.ink });
+        txt(svg, lx, ly + 9, fmt(v, spec), { anchor: an, size: 13, weight: 600, fill: i === spec.highlight ? T.accent : T.primary });
+      }
+      a0 = a1;
+    });
+    if (leg) leg = legend(svg, leg, cats, cols, T, true);
+    return { plot: plot, legend: leg, colors: cols, labelColors: cols.map(function (c) { return dark(c) ? T["on-primary"] : T.primary; }) };
+  }
+
+  function axes(spec, W, H, T, svg) {
+    var n = spec.categories.length, ser = spec.series, area = spec.type === "area";
+    var stacked = area && spec.stacked !== false && ser.length > 1;
+    var top = ser.length > 1 ? 30 : 0;
+    // 영역은 첫 점과 끝 점이 플롯의 양 끝에 놓이므로, 가로축 라벨이 밖으로 나가지 않게 좌우를 더 비운다
+    var padL = area ? 84 : 48, padR = area ? 40 : 14;
+    var plot = { x: padL, y: top + 18, w: W - padL - padR, h: H - top - 18 - 26 };
+    var leg = ser.length > 1 ? { x: plot.x, y: 0, w: plot.w, h: 22 } : null;
+    var hi = spec.highlight;
+    var cols = colors(ser.length, hi == null ? -1 : hi, T);
+    var tops = spec.categories.map(function (_, j) {
+      return stacked ? ser.reduce(function (a, s) { return a + Number(s.values[j] || 0); }, 0) : Math.max.apply(null, ser.map(function (s) { return Number(s.values[j] || 0); }));
+    });
+    var ymax = spec.max || niceMax(Math.max.apply(null, tops)), major = ymax / 4;
+    var X = function (j) { return area ? plot.x + (n > 1 ? (j * plot.w) / (n - 1) : plot.w / 2) : plot.x + ((j + 0.5) * plot.w) / n; };
+    var Y = function (v) { return plot.y + plot.h - (v / ymax) * plot.h; };
+    for (var g = 1; g <= 4; g++) el("line", { x1: plot.x, x2: plot.x + plot.w, y1: Y(g * major), y2: Y(g * major), stroke: T.hair, "stroke-width": 1 }, svg);
+    for (g = 0; g <= 4; g++) txt(svg, plot.x - 8, Y(g * major), fmt(g * major, spec), { anchor: "end", size: 11.5, fill: T.muted });
+    spec.categories.forEach(function (c, j) { txt(svg, X(j), plot.y + plot.h + 14, c, { anchor: "middle", size: 12, fill: T.muted }); });
+    if (area) {
+      var base = spec.categories.map(function () { return 0; });
+      ser.forEach(function (s, i) {
+        var lo = base.slice(), hiv = base.map(function (b, j) { return (stacked ? b : 0) + Number(s.values[j] || 0); });
+        var d = "M" + hiv.map(function (v, j) { return X(j) + " " + Y(v); }).join(" L");
+        d += " L" + lo.map(function (v, j) { return X(j) + " " + Y(stacked ? v : 0); }).reverse().join(" L") + " Z";
+        el("path", { d: d, fill: cols[i], "fill-opacity": 1 }, svg);
+        if (stacked) base = hiv;
+      });
+    } else {
+      var mode = spec.labels || (ser.length > 1 ? "last" : "all");
+      ser.forEach(function (s, i) {
+        var pts = s.values.map(function (v, j) { return X(j) + " " + Y(Number(v)); });
+        el("path", { d: "M" + pts.join(" L"), fill: "none", stroke: cols[i], "stroke-width": 3, "stroke-linejoin": "round" }, svg);
+        s.values.forEach(function (v, j) {
+          el("circle", { cx: X(j), cy: Y(Number(v)), r: 4.5, fill: cols[i] }, svg);
+          if (mode === "all" || (mode === "last" && j === n - 1))
+            txt(svg, X(j), Y(Number(v)) - 14, fmt(v, spec), { anchor: "middle", size: 12.5, weight: 600, fill: i === hi ? T.accent : T.primary });
+        });
+      });
+    }
+    el("line", { x1: plot.x, x2: plot.x + plot.w, y1: plot.y + plot.h, y2: plot.y + plot.h, stroke: T.primary, "stroke-width": 1.5 }, svg);
+    if (leg) leg = legend(svg, leg, ser.map(function (s) { return s.name; }), cols, T, area ? false : "line");
+    return { plot: plot, legend: leg, colors: cols, ymax: ymax, major: major, between: !area, stacked: stacked, labels: area ? "none" : (spec.labels || (ser.length > 1 ? "last" : "all")) };
+  }
+
+  function draw(box) {
+    var spec;
+    try { spec = JSON.parse(box.getAttribute("data-chart")); } catch (e) { box.setAttribute("data-error", "data-chart를 읽지 못했다: " + e.message); return; }
+    var old = box.querySelector("svg.nc");
+    if (old) old.remove();
+    var r = box.getBoundingClientRect(), W = r.width, H = r.height, T = tokens(box);
+    var svg = el("svg", { class: "nc", width: W, height: H, viewBox: "0 0 " + W + " " + H });
+    box.insertBefore(svg, box.firstChild);
+    var lay = spec.type === "line" || spec.type === "area" ? axes(spec, W, H, T, svg) : round(spec, W, H, T, svg);
+    lay.W = W; lay.H = H; lay.tokens = T;
+    [["plot", lay.plot], ["legend", lay.legend]].forEach(function (kv) {
+      var b = kv[1];
+      if (!b) return;
+      if (b.w <= 0 || b.h <= 0 || b.x < -2 || b.y < -2 || b.x + b.w > W + 2 || b.y + b.h > H + 2)
+        throw new Error((kv[0] === "legend" ? "범례" : "플롯") + "가 차트 영역을 벗어난다. 항목 이름을 줄이거나 항목 수를 줄인다");
+      b.x = Math.max(0, b.x); b.y = Math.max(0, b.y); b.w = Math.min(b.w, W - b.x); b.h = Math.min(b.h, H - b.y);
+    });
+    if (lay.major != null && !(lay.major > 0 && isFinite(lay.major))) throw new Error("세로축 눈금을 정하지 못했다 (max와 values를 확인한다)");
+    box.setAttribute("data-layout", JSON.stringify(lay));
+    // 도넛 가운데 글자(.nc-ctr)는 HTML 글자로 두어 PPTX에서 글상자가 된다. 원의 가운데에 맞춘다
+    var ctr = box.querySelector(".nc-ctr");
+    if (ctr && spec.type === "doughnut") {
+      ctr.style.left = lay.plot.x + "px"; ctr.style.top = lay.plot.y + "px";
+      ctr.style.width = lay.plot.w + "px"; ctr.style.height = lay.plot.h + "px";
+    }
+  }
+  function all() {
+    document.querySelectorAll(".nchart[data-chart]").forEach(function (box) {
+      box.removeAttribute("data-error");
+      box.removeAttribute("data-layout");
+      try { draw(box); } catch (e) {
+        box.removeAttribute("data-layout");
+        box.setAttribute("data-error", String(e.message || e));
+        if (window.console) console.error("nchart:", e.message || e);
+      }
+    });
+  }
+  window.nchartRender = all;
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", all); else all();
+  window.addEventListener("load", all); // 그림이 늦게 불러와져 상자 크기가 바뀌어도 다시 그린다
+})();
+/*nchart.js:end*/</script>
+</body></html>

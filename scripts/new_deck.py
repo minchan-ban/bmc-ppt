@@ -11,7 +11,8 @@
   - brand.json의 회사명, 브랜드 색, 뒤표지 연락처를 기본값으로 쓴다 (--company, --brand로 덮어쓸 수 있다).
   - {{회사명}}과 {{꼬리말}}을 채우고, 쪽 번호를 매긴다 (표지·장 구분·뒤표지는 번호에서 제외).
   - 나머지 {{ }} 자리표시자는 그대로 둔다. 하나라도 남으면 check_deck.py가 FAIL을 낸다.
-  - design/deck.css를 고친 뒤에는 --refresh-css로 기존 덱의 스타일을 갱신한다.
+  - design/nchart.js(원형·도넛·꺾은선·영역 차트의 미리보기 렌더러)를 <script>에 넣는다.
+  - design/deck.css나 design/nchart.js를 고친 뒤에는 --refresh-css로 기존 덱의 스타일과 렌더러를 갱신한다.
 """
 import argparse
 import json
@@ -22,6 +23,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PARTS = ROOT / "design" / "parts.html"
 CSS = ROOT / "design" / "deck.css"
+JS = ROOT / "design" / "nchart.js"   # 기본 차트 부품(p58~p61)의 미리보기 렌더러
 TYPES = {"investor": "투자자용 사업 소개", "sales": "B2B 제품 소개서"}
 PALETTES = {"rose": "A. 차콜 + 로즈 포인트 (기본)", "rose-panel": "B. 차콜 글자 + 로즈 면",
             "berry": "C. 버건디 + 로즈", "navy-rose": "D. 네이비 + 로즈 포인트"}
@@ -35,6 +37,18 @@ def load_parts():
     for pid, type_id, name, use, html in PART_RE.findall(PARTS.read_text(encoding="utf-8")):
         out[pid] = {"type": type_id, "name": name.strip(), "use": use.strip(), "html": html}
     return out
+
+
+def script_block():
+    return "<script>/*nchart.js:start*/\n" + JS.read_text(encoding="utf-8") + "/*nchart.js:end*/</script>"
+
+
+def with_script(html):
+    """덱에 들어 있는 nchart.js를 design/nchart.js의 현재 내용으로 바꾼다. 없으면 </body> 앞에 넣는다."""
+    m = re.search(r"<script>/\*nchart\.js:start\*/.*?/\*nchart\.js:end\*/</script>", html, flags=re.S)
+    if m:
+        return html[:m.start()] + script_block() + html[m.end():]
+    return html.replace("</body>", script_block() + "\n</body>", 1)
 
 
 def main():
@@ -60,6 +74,7 @@ def main():
         if not m:
             sys.exit("이 파일에는 deck.css 구간 표시가 없다 (new_deck.py로 만든 덱이 아니다)")
         html = html[:m.start()] + "/*deck.css:start*/\n" + CSS.read_text(encoding="utf-8") + "/*deck.css:end*/" + html[m.end():]
+        html = with_script(html)
         note = ""
         if a.set_palette:
             html, n = re.subn(r'(<main class="deck" data-theme=")[^"]*(")', rf"\g<1>{a.set_palette}\g<2>", html, count=1)
@@ -111,6 +126,7 @@ def main():
 <main class="deck" data-theme="{a.palette}" data-type="{a.type}">
 {chr(10).join(body)}
 </main>
+{script_block()}
 </body></html>
 """, encoding="utf-8")
     print(f"{out}: {len(body)}장 (쪽 번호 {page}쪽), 유형 {a.type}, 팔레트 {a.palette} ({PALETTES[a.palette]})")

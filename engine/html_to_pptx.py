@@ -16,6 +16,7 @@
 변환 방식: html_dump.mjs가 Chrome으로 그린 요소의 위치와 모양을 기록하고, 이 스크립트가 PowerPoint 도형으로 조립한다.
   글자 → 글상자 / 채움·테두리 → 사각형·다각형·타원 / 한쪽 괘선 → 직선 / 표 → PowerPoint 표
   SVG·img·배경 이미지 → PNG 그림 (안의 글자와 수치는 편집할 수 없으므로 부품에서 SVG를 쓰지 않는다)
+  .nchart (원형·도넛·꺾은선·영역) → PowerPoint 기본 차트 (engine/native_chart.py. '데이터 편집'으로 수치를 고친다)
 필요한 것: Node 22 이상, Chrome, python-pptx.
 """
 import json
@@ -34,6 +35,9 @@ from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE, PP_ALIGN
 from pptx.opc.constants import RELATIONSHIP_TYPE as RT
 from pptx.oxml.ns import qn
 from pptx.util import Emu, Pt
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from native_chart import add_chart  # noqa: E402  원형·도넛·꺾은선·영역을 PowerPoint 기본 차트로
 
 SLIDE_W, SLIDE_H = 12192000, 6858000
 FAMILY = "Pretendard"
@@ -430,6 +434,11 @@ def convert(html, out):
                         images += 1
                 elif t == "table":
                     add_table(slide, it, sc, n)
+                elif t == "chart":
+                    try:
+                        add_chart(slide, it, sc, n)
+                    except ValueError as e:
+                        sys.exit(f"{s['n']}장의 기본 차트를 만들지 못했다: {e}")
             for it in items:
                 n += 1
                 if it["t"] == "text" and it["paras"]:

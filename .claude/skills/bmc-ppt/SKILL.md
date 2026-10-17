@@ -80,6 +80,7 @@ python3 scripts/new_deck.py --type <유형> --palette <팔레트> --parts p01,p0
 - 본문에는 헤드메시지를 증명하는 것만 싣는다. 헤드메시지의 수치는 본문에 그대로 있어야 한다(H9).
 - 행과 열의 개수는 내용에 맞게 더하거나 뺀다. 견본의 개수에 내용을 맞추지 않는다.
 - 막대의 길이와 높이는 `style`의 `width`, `height` 비율을 실제 값의 비율로 계산해서 넣는다. 강조(`on`)는 헤드메시지가 말하는 항목 하나에만 둔다.
+- 기본 차트 부품(p58~p61: 도넛, 원형, 꺾은선, 누적 영역)은 비율을 계산하지 않고 `data-chart`의 `categories`, `series`의 `values`에 실제 수치를 넣는다. 강조는 `highlight`에 번호로 적는다. 항목은 `design/nchart.js` 머리말에 있다.
 - 수치가 있는 장에는 출처 줄을 채운다. 출처 줄이 필요 없는 장에서는 `.src` 요소를 지운다.
 - 제품 화면은 `.shot` 안의 `<span>`을 `<img src="...">`로 바꾼다. 이미지는 덱 폴더의 `assets/`에 둔다.
 - **기업 로고가 필요하면** `harness/logo-rules.md`의 절차를 따른다. 회사마다 아래를 실행하고, 미리보기(`assets/logos/_preview/<이름>.png`)를 Read로 직접 본 뒤 맞지 않으면 후보(`--pick`)나 방식(`--mode`)을 바꿔 다시 한다. 세 번 다시 해도 맞는 로고를 얻지 못하면 사용자에게 묻는다.
@@ -151,4 +152,4 @@ python3 scripts/copy_pass.py apply decks/<이름>/deck.html
 | `harness/lexicon.json` | 검사기가 쓰는 어휘 목록 | 지적받은 표현을 추가할 때 |
 | `design/catalog.md` | 전하려는 내용에 맞는 부품 고르기 | 3단계 |
 | `design/typography.md` | Pretendard 굵기 구분 | 부품을 고치거나 새로 짤 때 |
-| `design/deck.css`, `design/parts.html` | 디자인 토큰과 부품 47종 | 부품을 고치거나 새로 짤 때 |
+| `design/deck.css`, `design/parts.html` | 디자인 토큰과 부품 61종 | 부품을 고치거나 새로 짤 때 |

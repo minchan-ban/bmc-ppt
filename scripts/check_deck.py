@@ -13,6 +13,7 @@
 import argparse
 import html as htmllib
 import json
+import math
 import re
 import sys
 import zipfile
@@ -24,7 +25,9 @@ LEX = json.loads((ROOT / "harness" / "lexicon.json").read_text(encoding="utf-8")
 TITLE_MIN, TITLE_ONE_LINE, TITLE_MAX = 14, 40, 64
 NUM_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
 COUNT_RE = r"(\d+|[두세네]|다섯|여섯)\s?(가지|개의|단계|스텝|요소|축|포인트|이유|원칙)"
-CHART_CLASSES = ("bars", "colchart", "kpis", "calc", "stack", "sp", "wf", "stk", "grp", "fnl", "sc", "dots", "heat")
+CHART_CLASSES = ("bars", "colchart", "kpis", "calc", "stack", "sp", "wf", "stk", "grp", "fnl", "sc", "dots", "heat",
+                 "dm", "pc", "kd", "mk", "db", "dv", "tg", "nchart")
+NCHART_TYPES = ("doughnut", "pie", "line", "area")
 VOID = {"br", "img", "meta", "link", "hr", "input"}
 
 fails, warns = [], []
@@ -50,6 +53,7 @@ class Slide:
         self.used_classes = set()
         self.has_svg = False
         self.inline_styles = []
+        self.chart_errors = []   # data-chart(기본 차트)의 형식 오류
 
     @property
     def body_text(self):
@@ -81,6 +85,8 @@ class DeckParser(HTMLParser):
             self.cur.inline_styles.append(a["style"])
         if tag == "svg":
             self.cur.has_svg = True
+        if "data-chart" in a:
+            self.read_chart(a["data-chart"])
         if tag == "br":
             if self.buf is not None:
                 self.buf.append("\n")
@@ -95,6 +101,75 @@ class DeckParser(HTMLParser):
         if tag in ("h1", "li", "td", "th") or (tag == "div" and cls) or (tag == "span" and cls):
             self.flush()
             self.buf = []
+
+    def read_chart(self, raw):
+        """기본 차트의 수치와 이름을 본문 글자로 넣는다. 그래야 출처(S1), 자리표시자(C1), 팩트 원장(H10) 검사가 차트에도 걸린다.
+        형식 오류는 S7로 모은다. 여기서 막지 못한 값은 nchart.js나 html_to_pptx.py에서 변환을 멈추게 한다."""
+        errs = self.cur.chart_errors
+
+        def bad_const(c):
+            raise ValueError(f"{c}는 쓸 수 없다")
+        try:
+            spec = json.loads(raw, parse_constant=bad_const)   # NaN, Infinity는 브라우저가 읽지 못한다
+        except ValueError as e:
+            errs.append(f"data-chart를 JSON으로 읽지 못했다 ({e})")
+            return
+        if not isinstance(spec, dict):
+            errs.append("data-chart는 {...} 형태의 객체여야 한다")
+            return
+        num = lambda v: type(v) in (int, float) and math.isfinite(v)   # bool(True, False)은 숫자로 치지 않는다
+        cats, series, typ = spec.get("categories"), spec.get("series"), spec.get("type")
+        if typ not in NCHART_TYPES:
+            errs.append(f"type이 '{typ}'이다. {', '.join(NCHART_TYPES)} 중 하나여야 한다")
+        if not isinstance(cats, list) or not cats:
+            errs.append("categories는 비어 있지 않은 목록이어야 한다")
+            cats = []
+        if not isinstance(series, list) or not series or not all(isinstance(x, dict) for x in series):
+            errs.append('series는 {"name": ..., "values": [...]} 객체의 목록이어야 한다')
+            series = [x for x in series if isinstance(x, dict)] if isinstance(series, list) else []
+        for sr in series:
+            vals = sr.get("values")
+            if not isinstance(vals, list):
+                errs.append(f"계열 '{sr.get('name')}'에 values 목록이 없다")
+                continue
+            if len(vals) != len(cats):
+                errs.append(f"계열 '{sr.get('name')}'의 값이 {len(vals)}개이고 categories는 {len(cats)}개다. 개수를 맞춘다")
+            if not all(num(v) for v in vals):
+                errs.append(f"계열 '{sr.get('name')}'의 values에 숫자가 아닌 값이 있다 (따옴표 없이 숫자만 적는다)")
+            elif any(v < 0 for v in vals):
+                errs.append(f"계열 '{sr.get('name')}'에 음수가 있다. 기본 차트는 0부터 그린다 (증감은 p55를 쓴다)")
+        all_vals = [v for sr in series for v in (sr.get("values") or []) if num(v)] if series else []
+        if typ in ("doughnut", "pie"):
+            if len(series) != 1:
+                errs.append("원형과 도넛은 계열을 하나만 쓴다")
+            if len(cats) > 5:
+                errs.append(f"원형과 도넛의 조각이 {len(cats)}개다. 5개 이하로 묶거나 p06·p08로 바꾼다")
+            if all_vals and sum(all_vals) <= 0:
+                errs.append("원형과 도넛의 값 합계가 0이다")
+        if typ == "area" and len(cats) < 2:
+            errs.append("영역은 시점이 2개 이상이어야 한다")
+        hi = spec.get("highlight")
+        if hi is not None and not (type(hi) is int and 0 <= hi < (len(cats) if typ in ("doughnut", "pie") else len(series))):
+            errs.append(f"highlight {hi!r}가 범위를 벗어난다 (0부터 세는 정수)")
+        d = spec.get("decimals")
+        if d is not None and not (type(d) is int and 0 <= d <= 6):
+            errs.append(f"decimals {d!r}는 0~6의 정수여야 한다")
+        mx = spec.get("max")
+        if mx is not None and not (num(mx) and mx > 0):
+            errs.append(f"max {mx!r}는 0보다 큰 숫자여야 한다")
+        elif mx is not None and all_vals and typ in ("line", "area") and mx < max(all_vals):
+            errs.append(f"max {mx}가 가장 큰 값 {max(all_vals)}보다 작다")
+        unit = spec.get("unit")
+        if unit is not None and not (isinstance(unit, str) and len(unit) <= 6 and not re.search(r'["&<>\\]', unit)):
+            errs.append(f'unit {unit!r}는 6자 이하이고 " & < > \\ 를 쓰지 않는다')
+        if spec.get("labels") not in (None, "all", "last", "none"):
+            errs.append(f"labels {spec.get('labels')!r}는 all, last, none 중 하나여야 한다")
+        if spec.get("stacked") not in (None, True, False):
+            errs.append("stacked는 true나 false여야 한다")
+        unit = unit if isinstance(unit, str) else ""
+        words = [str(c) for c in cats] + [str(sr.get("name", "")) for sr in series]
+        words += [f"{v}{unit}" for v in all_vals]
+        self.cur.blocks.append(("nchart", " ".join(words)))
 
     def handle_endtag(self, tag):
         if self.cur is None:
@@ -318,6 +393,8 @@ def check_body(s):
 
 def check_format(s, raw_theme):
     page = s.n
+    for e in s.chart_errors:
+        fail(page, "S7", f"기본 차트: {e}")
     special = [c for c in ("cover", "divider", "back") if c in s.classes]
     if not special:
         has_chart = any(c in s.used_classes for c in CHART_CLASSES)
@@ -328,7 +405,7 @@ def check_format(s, raw_theme):
             fail(page, "S1", "출처 줄이 비어 있다")
         if not s.kicker:
             warn(page, "S2", "키커(오른쪽 위의 주제 라벨)가 없다")
-        if "on" not in s.used_classes and any(c in s.used_classes for c in ("bars", "colchart", "grp", "fnl", "sc", "dots")):
+        if "on" not in s.used_classes and any(c in s.used_classes for c in ("bars", "colchart", "grp", "fnl", "sc", "dots", "mk", "db", "dv", "tg")):
             warn(page, "S3", "막대 도표에 강조한 막대가 없다. 헤드메시지가 말하는 항목 하나만 강조한다")
     if s.has_svg:
         warn(page, "S4", "SVG는 PPTX에서 그림으로 변환되어 편집할 수 없다. 부품의 div 도형으로 그린다")
@@ -362,6 +439,8 @@ def check_html(path, facts, forbid):
             for path_, text in s.blocks:
                 if "{{" in text:
                     fail(s.n, "C1", f"자리표시자가 남아 있다: {text[:40]}")
+            for e in s.chart_errors:
+                fail(s.n, "S7", f"기본 차트: {e}")
             continue
         label_ok = s.attrs.get("data-label") == "1"
         labels += label_ok
@@ -428,6 +507,13 @@ def check_pptx(path):
             m = re.search(r'<p:ph type="title"/>.*?</p:sp>', xml, flags=re.S)
             if m:
                 titles.append((i, htmllib.unescape(" ".join(re.findall(r"<a:t>([^<]*)</a:t>", m.group(0))))))
+        for name in sorted(n for n in z.namelist() if re.match(r"ppt/charts/chart\d+\.xml$", n)):
+            xml = z.read(name).decode("utf-8")
+            faces = set(re.findall(r'<a:(?:latin|ea) typeface="([^"+][^"]*)"', xml)) - ok_faces
+            if faces:
+                fail(0, "P1", f"차트 {name.rsplit('/', 1)[-1]}에 Pretendard가 아닌 글꼴이 있다: {sorted(faces)[:4]}")
+            if "{{" in htmllib.unescape(re.sub(r"<[^>]+>", " ", xml)):
+                fail(0, "C1", f"차트 {name.rsplit('/', 1)[-1]}의 항목 이름이나 계열 이름에 자리표시자가 남아 있다")
         theme = z.read("ppt/theme/theme1.xml").decode("utf-8")
         if 'typeface="Pretendard' not in theme:
             fail(0, "P1", "테마 글꼴이 Pretendard가 아니다")

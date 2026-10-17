@@ -4,6 +4,7 @@
 //   - ul/ol 목록을 문단이 여러 개인 글상자 하나로 묶음 (PowerPoint에서 글머리표를 이어서 편집 가능)
 //   - 글상자에 원래 블록의 내용 영역(bx, bw)을 함께 기록 (글자를 늘려도 자연스럽게 줄바꿈)
 //   - img 태그의 원본 파일 주소를 함께 기록 (로고와 제품 화면을 원본 해상도로 PPTX에 넣는다)
+//   - .nchart(원형·도넛·꺾은선·영역)는 수치와 배치를 chart 항목으로 기록 (html_to_pptx.py가 PowerPoint 기본 차트로 만든다)
 // HTMLデッキを描画し、スライドごとの要素（塗り・罫線・多角形・文字・表・画像）を座標付きで JSON に書き出す。
 // html_to_pptx.py が内部で呼ぶ。単体: node html_dump.mjs deck.html outdir  → outdir/dump.json と outdir/img_*.png
 // SVG・canvas・img・背景画像は要素単体をスクリーンショットして PNG にする（透過）。
@@ -221,7 +222,8 @@ const collect = () => {
 
   // 선택 창에 보일 도형 이름: 가장 가까운 클래스 이름
   const nameOf = (el) => { for (let e = el; e && e !== document.body; e = e.parentElement) { const c = (e.getAttribute("class") || "").trim().split(/\s+/)[0]; if (c) return c; } return ""; };
-  const out = [];
+  const out = [], chartErrors = [];
+  if (window.nchartRender) window.nchartRender(); // 수집 직전의 크기로 기본 차트를 다시 그린다
   slides.forEach((s, si) => {
     const sr = s.getBoundingClientRect();
     const rel = (r) => ({ x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height });
@@ -236,6 +238,19 @@ const collect = () => {
       const r = el.getBoundingClientRect();
       if (!r.width && !r.height && !el.children.length) return;
       const st = getComputedStyle(el);
+
+      // PowerPoint 기본 차트 자리 (design/nchart.js가 그린 미리보기). SVG는 그림으로 찍지 않고 수치와 배치만 넘긴다
+      if (el.classList.contains("nchart")) {
+        let spec = null, layout = null;
+        try { spec = JSON.parse(el.getAttribute("data-chart")); layout = JSON.parse(el.getAttribute("data-layout")); } catch {}
+        if (!spec || !layout) {
+          chartErrors.push(`${si + 1}장: ${el.getAttribute("data-error") || "차트를 그리지 못했다 (nchart.js가 덱에 없거나 data-chart가 비어 있다)"}`);
+          return;
+        }
+        items.push({ cls: "nchart", t: "chart", ...rel(r), spec, layout });
+        for (const c of el.children) if (!(c.tagName.toLowerCase() === "svg" && c.classList.contains("nc"))) visit(c, false);
+        return;
+      }
 
       if (MEDIA.has(tag)) {
         if (r.width > 1 && r.height > 1) {
@@ -423,7 +438,7 @@ const collect = () => {
     const probe = document.createElement("i"); probe.style.color = `var(--${k})`; host.appendChild(probe);
     const c = rgba(getComputedStyle(probe).color); probe.remove(); if (c) tokens[k] = c.hex;
   }
-  return { slideW: s0 ? s0.width : 1280, slideH: s0 ? s0.height : 720, slides: out, captures, tokens, theme: host.getAttribute("data-theme") || "", title: document.title };
+  return { chartErrors, slideW: s0 ? s0.width : 1280, slideH: s0 ? s0.height : 720, slides: out, captures, tokens, theme: host.getAttribute("data-theme") || "", title: document.title };
 };
 
 let data;
@@ -447,6 +462,11 @@ for (const c of data.captures) {
   writeFileSync(join(outdir, `${c.id}.png`), Buffer.from(b64, "base64"));
 }
 delete data.captures;
+if (data.chartErrors.length) {
+  console.error("기본 차트를 PPTX로 바꾸지 못했다:\n  " + data.chartErrors.join("\n  "));
+  await page.close();
+  process.exit(7);
+}
 writeFileSync(join(outdir, "dump.json"), JSON.stringify(data));
 await page.close();
 console.log(`${data.slides.length} slides → ${join(outdir, "dump.json")}`);
