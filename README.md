@@ -11,7 +11,7 @@ Claude Code에서 이 폴더를 열고 `/bmc-ppt`를 실행하면 아래 절차�
 
 ## 시작하기
 
-준비물: macOS, [Claude Code](https://claude.com/claude-code), Node 22 이상, Google Chrome.
+준비물: macOS, [Claude Code](https://claude.com/claude-code)와 Claude 계정, Node 22 이상, Google Chrome. Figma로 내보내려면 Figma 계정도 있어야 한다 (아래 "필요한 계정").
 미리보기 PNG를 만들려면 `brew install poppler`가 필요하다. PowerPoint와 Figma 데스크톱 앱이 있으면 결과물을 바로 열 수 있다.
 
 ```bash
@@ -20,6 +20,22 @@ cd bmc-ppt
 bash scripts/setup.sh --check   # 무엇이 빠졌는지 확인
 bash scripts/setup.sh           # .venv, python-pptx, Pretendard 글꼴 설치, /humanize-korean 스킬 연결
 ```
+
+### 필요한 계정
+
+| 계정 | 필요한 경우 | 인증하는 때 |
+|---|---|---|
+| Claude | 항상 | 이 폴더에서 `claude`를 처음 실행할 때 Claude Code가 로그인을 요구한다 |
+| Figma | Figma로 내보낼 때만 | 아래의 Figma MCP를 연결할 때 |
+
+- **Claude**: Claude Code를 쓸 수 있는 유료 요금제(Pro, Max, Team, Enterprise)나 Anthropic Console 계정(API 사용량 과금)으로 로그인한다. 덱의 내용을 쓰고 검토하는 일은 모두 Claude Code 안에서 일어나며, 이 저장소의 스크립트는 API 키를 따로 요구하지 않는다.
+- **Figma**: Figma 계정을 만든 뒤 Claude Code에 Figma MCP를 한 번 연결한다.
+  ```bash
+  claude mcp add --transport http figma https://mcp.figma.com/mcp
+  ```
+  그다음 Claude Code에서 `/mcp`를 입력하고 `figma`를 골라 인증한다. 브라우저에 Figma 로그인 창이 열리고, 허용하면 연결이 끝난다. Figma로 내보낼 때는 Claude가 파일을 만들기 전에 한 번 더 확인을 받는다.
+- Figma MCP에는 요금제별 호출 한도가 있다. Starter 요금제에서는 한 세션에서 30회쯤 호출한 뒤 막혔고, 덱 40장을 보내는 데 5회쯤 쓴다 (`harness/figma-export.md`의 "호출 한도").
+- PPTX와 PDF만 만들 때는 Figma 계정이 없어도 된다. Codex나 OpenAI 계정은 어느 단계에서도 필요하지 않다.
 
 ### 1. 회사 정보 넣기
 
@@ -46,7 +62,7 @@ bash scripts/setup.sh           # .venv, python-pptx, Pretendard 글꼴 설치, 
 ### 3. 덱 만들기
 
 ```bash
-claude        # 이 폴더에서 Claude Code 실행
+claude        # 이 폴더에서 Claude Code 실행 (처음이면 Claude 로그인을 요구한다)
 ```
 Claude Code에서 `/bmc-ppt` 또는 "투자자용 IR 덱 만들어줘"라고 요청한다. 단계마다 확인을 받으며 진행한다.
 결과 예시는 `decks/_sample/`(가상 회사 '한끼랩'의 샘플 덱)에 있다. 도표 부품 26종을 예시 데이터로 채운 견본은 `decks/_chart-sample/`에 PDF, PPTX와 함께 있고, 그림으로 고르는 방법은 아래 [도표 갤러리](#도표-갤러리-어떤-그림을-고를까)에 있다. `.venv/bin/python scripts/build.py decks/_sample/deck.html --preview`로 직접 빌드해 볼 수 있다.
